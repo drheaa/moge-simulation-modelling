@@ -1,0 +1,39 @@
+\chapter{Model Description}
+
+This chapter presents the full mathematical formulation of the Marshall--Olkin Generalized Exponential (MOGE) distribution, including the cumulative distribution function (CDF) and probability density function (PDF) as introduced by Ristić and Kundu (2015).
+
+\section{Cumulative Distribution Function (CDF)}
+
+The MOGE distribution is defined through the following CDF:
+\[
+G(x;\alpha,\lambda,\theta)
+=
+\frac{
+\left( 1 - e^{-\lambda x} \right)^{\alpha}
+}{
+\theta + (1-\theta)
+\left( 1 - e^{-\lambda x} \right)^{\alpha}
+}.
+\]
+This expression appears as Equation (1) of the original paper.
+
+\section{Probability Density Function (PDF)}
+
+Differentiating $G(x)$ with respect to $x$ yields the PDF of the MOGE distribution:
+\[
+g(x;\alpha,\lambda,\theta)
+=
+\frac{
+\alpha \lambda \theta
+e^{-\lambda x}
+\left(1 - e^{-\lambda x}\right)^{\alpha - 1}
+}{
+\left[
+\theta + (1-\theta)
+\left(1 - e^{-\lambda x}\right)^{\alpha}
+\right]^2
+}.
+\]
+This matches Equation (2) of the 2015 paper.
+
+These two equations form the basis for all further developments in estimation, EM algorithm derivations, simulation work, and data analysis in later chapters.
