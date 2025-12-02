@@ -1,0 +1,45 @@
+\documentclass[12pt,a4paper]{report}
+
+% ----------------------------------------------------------
+% PREAMBLE (packages, formatting, commands)
+% ----------------------------------------------------------
+\input{preamble/packages}
+
+% ----------------------------------------------------------
+% BEGIN DOCUMENT
+% ----------------------------------------------------------
+\begin{document}
+
+% ------------------------ Title Page -----------------------
+\input{frontmatter/titlepage}
+
+% ------------------------ Abstract -------------------------
+\input{frontmatter/abstract}
+
+% ------------------- Acknowledgements ----------------------
+\input{frontmatter/acknowledgements}
+
+% ------------------ Table of Contents ----------------------
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------
+% Chapters
+% ----------------------------------------------------------
+
+\include{chapters/chapter1_introduction}
+\include{chapters/chapter2_distributions}
+\include{chapters/chapter3_model_description}
+\include{chapters/chapter4_methodology_em_overview}
+\include{chapters/chapter5_parameter_estimation}
+\include{chapters/chapter6_simulation_study}
+\include{chapters/chapter7_data_analysis}
+\include{chapters/chapter8_conclusion}
+
+% ----------------------------------------------------------
+% REFERENCES (BibTeX)
+% ----------------------------------------------------------
+\bibliographystyle{apalike}
+\bibliography{references}
+
+\end{document}

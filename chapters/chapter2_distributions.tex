@@ -1,0 +1,143 @@
+\chapter{Distributions}
+
+This chapter introduces the background distributions that motivate the development of the Marshall--Olkin Generalized Exponential (MOGE) model. We begin with the classical Exponential distribution, extend it to the Generalized Exponential distribution, and then explain the Marshall--Olkin method which provides an additional parameter to increase model flexibility. Finally, we present the MOGE distribution obtained by combining the Marshall--Olkin method with the GE model.
+
+\section{Exponential Distribution}
+
+The Exponential distribution is one of the simplest and most widely used lifetime distributions in statistics. It models the time until the occurrence of an event such as component failure, arrival time, or waiting time between Poisson events.
+
+The probability density function (PDF) is:
+\[
+f(x;\lambda) = \lambda e^{-\lambda x}, \qquad x>0, \ \lambda>0.
+\]
+
+The cumulative distribution function (CDF) is:
+\[
+F(x;\lambda) = 1 - e^{-\lambda x}.
+\]
+
+\subsection*{Why it is widely used}
+The Exponential distribution is popular because:
+\begin{itemize}
+    \item it has a simple closed-form PDF and CDF,
+    \item it is mathematically tractable,
+    \item it satisfies the ``memoryless'' property,
+    \item it appears naturally as the waiting-time distribution in a Poisson process.
+\end{itemize}
+
+\subsection*{Limitation}
+The major drawback of the Exponential distribution is its \textbf{constant hazard function}:
+\[
+h(x) = \lambda.
+\]
+This implies the failure rate does not change over time. In practice, many systems experience aging, early failures, wear-out periods, or mixed behaviour. Therefore, the Exponential distribution is often too restrictive for modelling real lifetime data.
+
+
+\section{Generalized Exponential (GE) Distribution}
+
+To overcome the limitations of the Exponential model, Gupta and Kundu (1999) introduced the Generalized Exponential (GE) distribution by adding a shape parameter $\alpha$.
+
+The cumulative distribution function (CDF) is:
+\[
+F(x;\alpha,\lambda) 
+= 
+\left(1 - e^{-\lambda x}\right)^{\alpha},
+\]
+
+and the probability density function (PDF) is:
+\[
+f(x;\alpha,\lambda)
+=
+\alpha \lambda e^{-\lambda x}
+\left(1 - e^{-\lambda x}\right)^{\alpha - 1}.
+\]
+
+\subsection*{Why GE is more flexible}
+The added shape parameter $\alpha$ allows the GE distribution to model data patterns that the Exponential distribution cannot. In particular:
+\begin{itemize}
+    \item For $\alpha > 1$, the PDF is \textbf{increasing}.
+    \item For $0 < \alpha < 1$, the PDF is \textbf{decreasing}.
+    \item For some $\alpha$, the PDF can be \textbf{unimodal}.
+\end{itemize}
+
+\subsection*{Properties}
+\begin{itemize}
+    \item The GE hazard function is always monotone (either increasing or decreasing).
+    \item It retains many analytical advantages of the Exponential distribution.
+    \item It provides a better fit than the Exponential distribution in many reliability and survival studies.
+\end{itemize}
+
+\subsection*{Applications}
+The GE distribution has been used in:
+\begin{itemize}
+    \item engineering reliability analysis,
+    \item biomedical survival data,
+    \item modelling component lifetimes,
+    \item statistical quality control.
+\end{itemize}
+
+\section{Marshall--Olkin Method}
+
+Marshall and Olkin (1997) proposed a general method for adding an extra parameter to an existing family of distributions. The goal is to increase the flexibility of the model while keeping mathematical tractability.
+
+\subsection*{Intuition}
+The Marshall--Olkin construction:
+\begin{itemize}
+    \item introduces a new shape parameter $\theta$,
+    \item modifies the tail behaviour of the distribution,
+    \item changes the hazard function shape,
+    \item preserves simple closed-form expressions.
+\end{itemize}
+
+\subsection*{Real-world interpretation}
+The method is based on a ``shock'' model. A system may fail due to:
+\begin{itemize}
+    \item external shocks,
+    \item internal failures,
+    \item or combinations of multiple independent risks.
+\end{itemize}
+The added parameter $\theta$ captures how these shocks interact with each other.
+
+\subsection*{Original uses}
+Marshall and Olkin first applied their method to:
+\begin{itemize}
+    \item the Exponential distribution,
+    \item and conceptually to the Weibull distribution.
+\end{itemize}
+The approach has since been extended to many other distributions.
+
+\section{Marshall--Olkin Generalized Exponential (MOGE) Distribution}
+
+Ristić and Kundu (2015) combined the Generalized Exponential distribution with the Marshall--Olkin method to obtain the Marshall--Olkin Generalized Exponential (MOGE) distribution, a flexible three-parameter lifetime model.
+
+\subsection*{Definition}
+The CDF of the MOGE distribution is:
+\[
+G(x;\alpha,\lambda,\theta)
+=
+\frac{(1 - e^{-\lambda x})^{\alpha}}
+     {\theta + (1-\theta)\left(1 - e^{-\lambda x}\right)^{\alpha}}.
+\]
+
+\subsection*{Special cases}
+From page 3 of the 2015 paper:
+\begin{itemize}
+    \item If $\theta = 1$, MOGE reduces to the Generalized Exponential (GE) distribution.
+    \item If $\alpha = 1$, MOGE becomes the Marshall--Olkin Exponential distribution.
+    \item If $\alpha = 1$ and $\theta = 1$, it becomes the classical Exponential distribution.
+\end{itemize}
+
+\subsection*{Why MOGE is more powerful}
+The MOGE distribution is considerably more flexible than the GE distribution because:
+\begin{itemize}
+    \item it introduces a third parameter $\theta$ (via the Marshall--Olkin method),
+    \item it can model a wider variety of shapes for lifetime data,
+    \item it supports \textbf{four hazard rate shapes}:
+    \begin{enumerate}
+        \item increasing,
+        \item decreasing,
+        \item bathtub,
+        \item inverted-bathtub.
+    \end{enumerate}
+\end{itemize}
+This behaviour is illustrated in Figure 2 on page 8 of the 2015 paper. The ability to represent all four hazard shapes makes the MOGE model much more suitable for complex reliability and survival datasets.
