@@ -1,0 +1,27 @@
+# Ignore all LaTeX build files
+*.aux
+*.bbl
+*.blg
+*.brf
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.synctex.gz
+*.gz
+*.nav
+*.snm
+*.vrb
+
+# Ignore generated PDFs
+*.pdf
+
+# VS Code settings that shouldn’t be committed
+.vscode/
+
+# macOS, Windows junk
+.DS_Store
+Thumbs.db

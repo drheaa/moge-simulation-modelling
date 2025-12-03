@@ -1,0 +1,40 @@
+\chapter{Introduction}
+
+Lifetime and reliability data appear frequently in engineering, medicine, survival
+studies, and industrial applications. Classical models such as the Exponential,
+Weibull, or Gamma distributions are commonly used due to their mathematical
+tractability and interpretability. However, in practice, these classical models fail
+to capture many important hazard-rate shapes, especially non-monotonic failure
+patterns. Many real-world systems exhibit bathtub-shaped or inverted bathtub
+hazard functions—patterns that traditional exponential-type models cannot
+adequately represent.
+
+To overcome these limitations, Marshall and Olkin (1997) introduced a general
+method for adding an extra parameter to an existing distribution family. Their
+construction allows greater flexibility while retaining mathematical tractability.
+Building on this idea, Ristić and Kundu (2015) proposed the
+\textit{Marshall–Olkin Generalized Exponential (MOGE)} distribution. This model
+extends the two-parameter Generalized Exponential (GE) distribution by
+introducing an additional parameter $\theta$, resulting in a more flexible
+three-parameter family.
+
+The MOGE distribution is capable of generating a wide range of density shapes
+and supports all four primary hazard-rate behaviours:
+
+\begin{itemize}
+    \item increasing,
+    \item decreasing,
+    \item bathtub-shaped,
+    \item upside-down bathtub shaped.
+\end{itemize}
+
+Because of this versatility, the MOGE model is a valuable tool for analyzing
+complex lifetime data where simpler models fail. Despite its flexibility, the
+distribution maintains a compact and tractable analytical form, making it suitable
+for parameter estimation and for modeling censored lifetime data.
+
+This study revisits and summarizes the theoretical structure of the MOGE
+distribution, focusing particularly on parameter estimation using the
+Expectation–Maximization (EM) algorithm. In later chapters, we present a
+simulation study to evaluate the performance of the EM algorithm for estimating
+the model parameters under various parameter settings and sample sizes.
