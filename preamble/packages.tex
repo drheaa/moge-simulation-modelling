@@ -5,9 +5,13 @@
 \usepackage{hyperref}
 \usepackage{setspace}
 \usepackage{geometry}
+\usepackage{titlesec}
+% Reduce vertical space before/after chapter titles
+\titlespacing*{\chapter}{0pt}{-10pt}{15pt}
 \geometry{margin=1in}
 \onehalfspacing
-
+% Rename 'Bibliography' heading to 'References'
+\renewcommand{\bibname}{References}
 % For tables, math, references
 \usepackage{booktabs}
 \usepackage{natbib}
