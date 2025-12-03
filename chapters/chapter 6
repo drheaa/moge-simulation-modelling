@@ -1,0 +1,115 @@
+\chapter{Data Analysis}
+
+\section{Introduction}
+
+The real dataset used in this study consists of first goal times recorded in FIFA Club World Cup matches (2025 season). The data was sourced from \textit{FootyStats}, a publicly available football statistics platform. Each observation represents the minute at which the first goal was scored by the home or away team. Matches with no goals were excluded since the modelling framework assumes strictly positive event times.
+
+After preprocessing and deduplication, a total of 29 observations each were obtained for home and away first-goal timings. These times form a positive-valued random variable and are therefore appropriate for survival-type lifetime models such as the Marshall--Olkin Generalized Exponential (MOGE) distribution.
+
+\section{Exploratory Data Analysis}
+
+\subsection*{Histogram of First Goal Times}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.75\textwidth]{histogram_first_goal.png}
+\caption{Histogram of First Goal Times in FIFA Club World Cup Matches}
+\end{figure}
+
+The histogram shows that first goals are most likely to occur within the first 30 minutes, with a long right tail indicating occasional late goals. The strong positive skewness suggests that exponential or Weibull-type distributions may be appropriate. The absence of multimodal structure supports the use of continuous time-to-event modelling.
+
+\subsection*{Empirical CDF Plot: Home vs Away First Goals}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{ecdf_home_away.png}
+\caption{Empirical CDFs for Home and Away First-Goal Times}
+\end{figure}
+
+Empirical cumulative distribution functions (ECDFs) were generated for home-team first goals ($X_1$) and away-team first goals ($X_2$). The ECDF enables visual comparison without assuming any parametric model.
+
+Both ECDF curves rise steeply in the initial time interval, implying that a large proportion of goals occur early. Roughly 80--90\% of goals occur within the first 40 minutes, after which the curves flatten. This indicates a long right tail and strong skewness.
+
+The away-team ECDF rises slightly faster than the home-team ECDF, suggesting marginally earlier scoring on average. However, the curves converge later, indicating overall similarity in scoring behavior.
+
+The nonlinearity of the ECDF curves provides evidence against the constant hazard assumption implied by the exponential distribution, reinforcing the suitability of more flexible models such as Weibull or MOGE.
+
+Furthermore, weak correlations between $X_1$ and $X_2$ support modelling the two scoring processes independently.
+
+\subsection*{TTT Plot (Total Time on Test)}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.75\textwidth]{ttt_home.png}
+\includegraphics[width=0.75\textwidth]{ttt_away.png}
+\caption{TTT Plots for Home and Away First-Goal Times}
+\end{figure}
+
+Total Time on Test (TTT) plots were generated to assess the shape of the hazard function. The empirical curve is compared to the diagonal reference line corresponding to an exponential distribution.
+
+For both home and away teams, the TTT curves lie \textbf{below} the diagonal line, indicating an Increasing Failure Rate (IFR):
+
+\[
+\text{TTT curve below diagonal} \;\Rightarrow\; \text{Increasing Hazard Rate (IFR)}.
+\]
+
+In football terms, the likelihood of scoring a first goal increases as time progresses. This aligns with match dynamics, where teams escalate offensive pressure towards halftime.
+
+Home-team curves show slightly sharper curvature, consistent with home-field advantage effects such as increased momentum and crowd support.
+
+\section{Model Fitting and Parameter Estimation}
+
+To evaluate the suitability of the MOGE distribution for modelling first-goal times, three lifetime models were fitted to both home and away datasets:
+
+\begin{itemize}
+    \item Weibull distribution (MLE estimation),
+    \item Gamma distribution (MLE estimation),
+    \item MOGE distribution (EM algorithm, due to latent variable structure).
+\end{itemize}
+
+Each model captures different hazard-rate behavior:
+
+\begin{itemize}
+    \item \textbf{Gamma:} flexible, but limited in capturing steep hazard changes.
+    \item \textbf{Weibull:} supports increasing or decreasing hazards, but monotonic.
+    \item \textbf{MOGE:} adds a third parameter $\theta$, allowing highly flexible hazard shapes and improved modelling of sudden changes in scoring likelihood.
+\end{itemize}
+
+Model comparison metrics included:
+
+\[
+\begin{aligned}
+\text{Log-likelihood:} &\;\text{fit strength},\\
+\text{AIC:} &\;\text{penalizes model complexity},\\
+\text{KS statistic:} &\;\text{distance between empirical and model CDFs}.
+\end{aligned}
+\]
+
+A superior model exhibits higher log-likelihood, lower AIC, and lower KS statistic.
+
+\section{Goodness-of-Fit Results}
+
+The fitted CDFs were compared visually with the empirical CDF. The MOGE model aligned most closely with the empirical data, particularly in the 0--30 minute range where most first goals occur. Weibull and Gamma models underestimated early scoring intensity.
+
+Despite having an additional parameter, the MOGE distribution achieved superior AIC and KS results, indicating that the improvement in fit justified its increased complexity.
+
+The MOGE model successfully captured the rapid increase in scoring likelihood near halftime, consistent with tactical adjustments and match intensity.
+
+\section{Discussion}
+
+The results demonstrate that football scoring behavior is time-dependent and characterized by an increasing hazard rate. The MOGE distribution effectively models this dynamic due to its flexible hazard structure governed by the parameter $\theta$.
+
+Simpler models relying on constant or monotonic hazards (exponential, Weibull) do not fully capture the variability introduced by tactical changes, psychological pressure, and strategic escalations during match play.
+
+Thus, the MOGE distribution emerges as a robust modelling choice for real-time football analytics and predictive applications where hazard-rate flexibility is essential.
+
+\section{Conclusion of Real Data Analysis}
+
+This chapter presented a comprehensive analysis of first-goal scoring times using real match data. Exploratory analysis revealed strong right skewness, concentration of early goals, and long-tailed behavior. Over 80\% of goals occurred before the 40th minute, indicating non-uniform scoring probability.
+
+TTT plots showed clearly convex shapes for both home and away teams, confirming an increasing hazard rate and ruling out constant-rate models. Similarity in home and away hazard behavior suggests comparable scoring dynamics across venues.
+
+Bootstrapping revealed variability in parameter estimation due to relatively small sample size. Correlation analysis indicated weak dependence between home and away first-goal times, supporting independent modelling.
+
+Overall, the observed skewness, hazard patterns, and independence justify the use of advanced lifetime models and motivate the simulation study presented in the next chapter.
+
