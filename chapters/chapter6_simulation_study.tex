@@ -1,0 +1,187 @@
+\chapter{Simulation Study}
+
+\section{Objective}
+
+This simulation study aims to systematically investigate the behavior of the EM-based Maximum Likelihood Estimators (MLEs) for the parameters 
+\[
+(\alpha, \lambda, \theta)
+\]
+of the Marshall--Olkin Generalized Exponential (MOGE) distribution.  
+Since the MOGE distribution is highly flexible and capable of modelling increasing, decreasing, and bathtub-shaped hazard functions, it is essential to understand how the estimator behaves in finite-sample conditions.  
+
+This simulation examines estimator consistency, convergence stability, and efficiency by computing bias and mean squared error (MSE) across varying sample sizes.
+
+\section{Simulation Setup and Methodology}
+
+Synthetic i.i.d.\ samples were generated from a MOGE distribution with true parameters:
+\[
+\alpha_0 = 1.5, \qquad \lambda_0 = 0.8, \qquad \theta_0 = 1.2.
+\]
+
+These represent a realistic lifetime distribution with a moderately increasing hazard rate.  
+
+Four sample sizes were considered:
+\[
+n = 30,\; 50,\; 100,\; 200.
+\]
+
+For each sample size, 200 Monte Carlo replications were performed. In each replication:
+
+\begin{enumerate}
+    \item Random samples were generated using inverse transform sampling.
+    \item Parameters $(\alpha, \lambda, \theta)$ were estimated using the EM algorithm.
+    \item The estimates were stored and later aggregated.
+\end{enumerate}
+
+This allowed computation of summary statistics (mean, bias, standard deviation, and MSE), providing a comprehensive view of estimator performance under different data conditions.
+
+\section{Boxplots of Parameter Estimates}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{boxplots_parameters.png}
+\caption{Boxplots of EM parameter estimates for different sample sizes.}
+\label{fig:boxplots}
+\end{figure}
+
+Figure~\ref{fig:boxplots} presents boxplots of the EM-based parameter estimates for $\alpha$, $\lambda$, and $\theta$, obtained from 200 Monte Carlo replications across the four sample sizes.
+
+The boxplots reveal the following trends:
+
+\begin{itemize}
+    \item For small samples (especially $n=30$), estimates show high variability and numerous outliers.
+    \item As sample size increases, interquartile ranges narrow significantly.
+    \item Median estimates become more stable and closer to each other across replications.
+    \item Variability in $\lambda$ and $\theta$ is highest in small samples, consistent with sensitivity to early-sample variation.
+\end{itemize}
+
+These results empirically validate the \textbf{consistency} of the EM estimators, demonstrating convergence and reduced uncertainty with increasing sample size.
+
+\section{Mean Squared Error vs.\ Sample Size}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{mse_vs_n.png}
+\caption{Mean Squared Error (MSE) of EM parameter estimates vs.\ sample size.}
+\label{fig:mse}
+\end{figure}
+
+Figure~\ref{fig:mse} illustrates the MSE of parameter estimates for $\alpha$, $\lambda$, and $\theta$ calculated across replications for sample sizes 
+\[
+n = 25,\; 50,\; 100,\; 200.
+\]
+
+The results show:
+
+\begin{itemize}
+    \item MSE decreases consistently as sample size increases, confirming estimator improvement.
+    \item For $n=25$, all parameters exhibit high error, with $\lambda$ showing the largest MSE.
+    \item For $n=100$ and $n=200$, MSE drops sharply, especially for $\alpha$.
+    \item The curves flatten between $n=100$ and $n=200$, suggesting diminishing returns with very large samples.
+\end{itemize}
+
+Overall, the results validate the consistency and convergence behavior of the EM estimators.
+
+\section{Convergence Behavior of the EM Algorithm}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{em_convergence.png}
+\caption{EM algorithm convergence for a simulated dataset ($n=100$).}
+\label{fig:convergence}
+\end{figure}
+
+Figure~\ref{fig:convergence} displays the log-likelihood evolution across EM iterations for a simulated dataset of size $n=100$.
+
+Key observations include:
+
+\begin{itemize}
+    \item The log-likelihood increases monotonically, consistent with the theoretical EM property.
+    \item Rapid early improvement is followed by smooth stabilization.
+    \item The algorithm converges in only a few iterations.
+    \item No oscillation or instability is observed, indicating effective initialization and a well-behaved likelihood surface.
+\end{itemize}
+
+This demonstrates that the EM algorithm is computationally efficient and stable for MOGE parameter estimation.
+
+\section{Bootstrapping for Parameter Stability}
+
+A non-parametric bootstrap procedure with 300 bootstrap samples was used to assess estimator stability for both home ($X_1$) and away ($X_2$) first-goal datasets.
+
+Each bootstrap replicate:
+
+\begin{enumerate}
+    \item Resamples the dataset with replacement,
+    \item Re-estimates $(\alpha, \lambda, \theta)$ using EM,
+    \item Records the parameter estimates.
+\end{enumerate}
+
+The results showed:
+
+\begin{itemize}
+    \item Substantial variability across bootstrap replicates, especially in small samples.
+    \item Wider dispersion for away-team estimates compared to home-team estimates.
+    \item Consistency with simulation findings: estimator variability decreases with sample size.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{bootstrap_histograms.png}
+\caption{Bootstrap histograms for $\alpha$, $\lambda$, and $\theta$ (home and away datasets).}
+\label{fig:bootstrap_hist}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{bootstrap_boxplots.png}
+\caption{Bootstrap boxplots comparing home and away parameter distributions.}
+\label{fig:bootstrap_box}
+\end{figure}
+
+These results emphasize the importance of sufficient sample sizes when interpreting MOGE parameters in real-world applications.
+
+\section{Scatter Plot Analysis for Dependency Assessment}
+
+A scatter plot was constructed to evaluate possible dependence between home first-goal times ($X_1$) and away first-goal times ($X_2$) within the same match.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{scatter_x1_x2.png}
+\caption{Scatter plot of paired home and away first-goal times.}
+\label{fig:scatter}
+\end{figure}
+
+Correlation coefficients were computed:
+
+\[
+\text{Pearson} = -0.0375, \qquad 
+\text{Spearman} = -0.0992, \qquad 
+\text{Kendall} = -0.0694.
+\]
+
+All values are close to zero and slightly negative, indicating:
+
+\begin{itemize}
+    \item Extremely weak dependence,
+    \item No meaningful trend in the scatter plot,
+    \item No need for bivariate or joint-survival modelling.
+\end{itemize}
+
+Thus, modelling $X_1$ and $X_2$ separately using marginal MOGE distributions is statistically justified.
+
+\section{Conclusion}
+
+This simulation study evaluated the performance of the MOGE distribution and the EM algorithm in recovering parameters under controlled experimental conditions.
+
+Major findings include:
+
+\begin{itemize}
+    \item EM estimators for $(\alpha, \lambda, \theta)$ are consistent and accurate with increasing sample size.
+    \item MSE decreases systematically, particularly for $\alpha$ and $\lambda$.
+    \item Boxplots show shrinking variability and improved estimator stability.
+    \item Log-likelihood convergence is monotonic and rapid.
+    \item Bootstrap results highlight realistic sampling variability in small datasets.
+    \item Dependency analysis confirms that home and away first-goal times are largely independent.
+\end{itemize}
+
+Overall, the simulation results validate the MOGE distribution as a powerful and reliable model for time-to-event phenomena such as first-goal scoring times in football. The study establishes strong support for applying MOGE to real datasets and sets a foundation for predictive modelling and further research.
