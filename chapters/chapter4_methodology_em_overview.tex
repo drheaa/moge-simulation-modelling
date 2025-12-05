@@ -1,0 +1,209 @@
+%=========================================================
+% CHAPTER 4: METHODOLOGY — EM ALGORITHM OVERVIEW
+%=========================================================
+
+
+\chapter{Methodology: EM Algorithm Overview}
+\label{chap:em_overview}
+
+
+The Expectation--Maximization (EM) algorithm, introduced by
+Dempster, Laird and Rubin (1977), is a widely used iterative method
+for obtaining maximum likelihood estimates (MLEs) in the presence of
+incomplete or latent data structures. Many statistical models, including
+members of the Marshall--Olkin family, naturally involve mechanisms that
+cannot be fully observed. In such cases, the observed-data likelihood
+becomes analytically complex, whereas a corresponding ``complete-data''
+formulation is significantly simpler.
+
+
+This chapter provides a conceptual overview of the EM algorithm, the
+conditions under which it is used, and why it is particularly suitable
+for the Marshall--Olkin Generalized Exponential (MOGE) distribution.
+No mathematical derivations appear here; these are presented in the
+next chapter.
+
+
+%---------------------------------------------------------
+\section{Conceptual Overview of the EM Algorithm}
+%---------------------------------------------------------
+
+
+When maximum likelihood estimation is performed under missing or
+unobserved information, the log-likelihood often becomes difficult to
+maximize directly. The key idea of the EM algorithm is to treat the
+data as if it consists of two parts: an observed component and an
+unobserved (latent) component. If the full data were available,
+maximization would typically be straightforward. The EM algorithm
+leverages this by iteratively ``filling in'' the missing part through
+conditional expectations.
+
+
+Each iteration of EM has two steps:
+
+
+\begin{itemize}
+    \item \textbf{E-step (Expectation):}  
+    Compute the expected value of the complete-data log-likelihood
+    with respect to the conditional distribution of the latent variables,
+    given the observed data and current parameter estimates.
+
+
+    \item \textbf{M-step (Maximization):}  
+    Maximize this expected log-likelihood with respect to the model
+    parameters to obtain updated estimates.
+\end{itemize}
+
+
+This two-step procedure is repeated until convergence, meaning that
+successive parameter estimates change negligibly.
+
+
+%---------------------------------------------------------
+\section{When EM Is Used}
+%---------------------------------------------------------
+
+
+The EM algorithm is appropriate in a wide range of settings, including:
+
+
+\begin{itemize}
+    \item \emph{Incomplete data scenarios}, where some components of the
+    data-generating process are unobserved.
+    \item \emph{Latent variable models}, such as mixture models, shock
+    models, and failure-time models with unobserved causes.
+    \item \emph{Censored or truncated data}, common in reliability and
+    survival analysis.
+    \item \emph{Likelihoods with no closed-form maximizers}, where solving
+    the likelihood equations directly is either impossible or unstable.
+\end{itemize}
+
+
+In these cases, the observed-data likelihood may involve complicated
+integrals or high-dimensional nonlinear systems that cannot be solved
+analytically. EM simplifies the optimization by replacing the missing
+components with their conditional expectations.
+
+
+%---------------------------------------------------------
+\section{Latent Variables in EM}
+%---------------------------------------------------------
+
+
+Latent variables represent unobserved structural features of the model.
+For the MOGE distribution, the formulation introduced by Risti\'c and
+Kundu (2015) shows that the model can be expressed using an unobserved
+quantity (often denoted as $Z$) representing an underlying geometric or
+shock-based mechanism. Incorporating $Z$ transforms the observed-data
+log-likelihood into a much simpler complete-data log-likelihood.
+
+
+Although $Z$ is not observable, its conditional expectation
+$E(Z \mid X)$ can be computed explicitly. This makes the E-step
+tractable and leads to separable maximization steps in the M-step.
+
+
+%---------------------------------------------------------
+\section{Steps of the EM Algorithm}
+%---------------------------------------------------------
+
+
+\subsection*{E-Step: Estimating the Missing Information}
+Given parameter values
+$(\alpha^{(k)}, \lambda^{(k)}, \theta^{(k)})$, the E-step computes:
+\[
+E\!\left[ Z \mid X ; \alpha^{(k)}, \lambda^{(k)}, \theta^{(k)} \right],
+\]
+and constructs the expected complete-data log-likelihood. This
+``pseudo'' log-likelihood treats the missing structure as known but
+replaces it with its conditional expectation.
+
+
+\subsection*{M-Step: Updating the Parameters}
+The M-step maximizes the pseudo log-likelihood with respect to
+$(\alpha, \lambda, \theta)$.  
+For MOGE, this step becomes significantly simpler than maximizing the
+original likelihood, because the latent structure allows the log-likelihood
+to decompose into parts that can be optimized separately.
+
+
+\subsection*{Iteration}
+The updated parameters are returned to the next E-step. Convergence is
+typically assessed by checking whether
+\[
+\left| \ell^{(k+1)} - \ell^{(k)} \right|
+\]
+or the relative parameter changes fall below a chosen tolerance.
+
+
+%---------------------------------------------------------
+\section{Why EM Provides Stable Updates}
+%---------------------------------------------------------
+
+
+The EM algorithm is known for its computational stability:
+
+
+\begin{itemize}
+    \item Each iteration is guaranteed not to decrease the observed-data
+    log-likelihood.
+    \item Parameter updates are smooth and avoid the large, unstable jumps
+    common in Newton--Raphson or quasi-Newton methods.
+    \item EM does not require second derivatives, reducing numerical
+    sensitivity.
+\end{itemize}
+
+
+These properties make EM especially attractive for models whose likelihood
+surfaces are complicated or nearly flat in certain directions, which is
+typical for Marshall--Olkin type models.
+
+
+%---------------------------------------------------------
+\section{Why EM Is Needed for the MOGE Model}
+%---------------------------------------------------------
+
+
+For the MOGE distribution, the likelihood equations for
+$(\alpha, \lambda, \theta)$ do \emph{not} admit closed-form solutions.
+Risti\'c and Kundu (2015) showed that:
+
+
+\begin{itemize}
+    \item The observed-data log-likelihood involves nonlinear expressions
+    such as
+    \[
+        \left( \theta + (1-\theta)(1-e^{-\lambda x})^{\alpha} \right)^{-2},
+    \]
+    which make the score equations analytically intractable.
+
+
+    \item Direct numerical optimization requires solving a
+    three-dimensional nonlinear system, which is computationally unstable
+    and highly sensitive to starting values.
+
+
+    \item Introducing the latent variable $Z$ leads to a complete-data
+    log-likelihood that is far easier to optimize, allowing the estimation
+    problem to be separated into a sequence of one-dimensional tasks.
+\end{itemize}
+
+
+Thus, the EM framework is not merely convenient but essential: it provides
+a practical and stable method for computing the MLEs of the MOGE parameters.
+
+
+%---------------------------------------------------------
+\section{Summary}
+%---------------------------------------------------------
+
+
+This chapter presented a conceptual overview of the EM algorithm and
+explained why it is the appropriate estimation method for the
+Marshall--Olkin Generalized Exponential distribution. EM allows the
+complex observed-data likelihood to be replaced with a tractable
+complete-data formulation, enabling stable and efficient parameter
+estimation. The next chapter develops the full EM derivation for the
+MOGE model, including the complete-data structure, the conditional
+expectations in the E-step, and the explicit update equations used in  
+the M-step.
