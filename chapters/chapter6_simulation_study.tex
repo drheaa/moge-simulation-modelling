@@ -1,187 +1,83 @@
-\chapter{Simulation Study}
+\chapter{Data Analysis}
 
-\section{Objective}
+\section{Introduction}
 
-This simulation study aims to systematically investigate the behavior of the EM-based Maximum Likelihood Estimators (MLEs) for the parameters 
-\[
-(\alpha, \lambda, \theta)
-\]
-of the Marshall--Olkin Generalized Exponential (MOGE) distribution.  
-Since the MOGE distribution is highly flexible and capable of modelling increasing, decreasing, and bathtub-shaped hazard functions, it is essential to understand how the estimator behaves in finite-sample conditions.  
+The real dataset used in this study consists of first-goal times recorded in FIFA Club World Cup matches (2025 season). The data was sourced from FootyStats, a publicly available football statistics platform. Each observation represents the minute at which the first goal was scored by the home or away team. Matches in which no goals were scored were excluded, as the model assumes strictly positive event times.
 
-This simulation examines estimator consistency, convergence stability, and efficiency by computing bias and mean squared error (MSE) across varying sample sizes.
+After the data was preprocessed and deduplicated, 29 observations each were obtained for home and away goal timings. Since these values are strictly positive, continuous, and time-to-event in nature, they are suitable for modelling using survival/lifetime distributions such as Weibull, Gamma, and the Marshall–Olkin Generalized Exponential (MOGE).
 
-\section{Simulation Setup and Methodology}
+The purpose of this chapter is to examine the behaviour of real scoring data, identify which probability distribution best describes it, and assess whether MOGE is a suitable modelling option for football scoring. Insights derived here form the basis for the simulation work in Chapter 7.
 
-Synthetic i.i.d.\ samples were generated from a MOGE distribution with true parameters:
-\[
-\alpha_0 = 1.5, \qquad \lambda_0 = 0.8, \qquad \theta_0 = 1.2.
-\]
+% ---------------------------------------------------------
+\section{Exploratory Data Analysis}
 
-These represent a realistic lifetime distribution with a moderately increasing hazard rate.  
+\subsection{Histogram of First Goal Times}
 
-Four sample sizes were considered:
-\[
-n = 30,\; 50,\; 100,\; 200.
-\]
-
-For each sample size, 200 Monte Carlo replications were performed. In each replication:
-
-\begin{enumerate}
-    \item Random samples were generated using inverse transform sampling.
-    \item Parameters $(\alpha, \lambda, \theta)$ were estimated using the EM algorithm.
-    \item The estimates were stored and later aggregated.
-\end{enumerate}
-
-This allowed computation of summary statistics (mean, bias, standard deviation, and MSE), providing a comprehensive view of estimator performance under different data conditions.
-
-\section{Boxplots of Parameter Estimates}
-
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
-\includegraphics[width=0.9\textwidth]{boxplots_parameters.png}
-\caption{Boxplots of EM parameter estimates for different sample sizes.}
-\label{fig:boxplots}
+\includegraphics[width=0.8\linewidth]{fig6_1_histogram.png}
+\caption{Histogram of First Goal Times in FIFA Club World Cup Matches}
 \end{figure}
 
-Figure~\ref{fig:boxplots} presents boxplots of the EM-based parameter estimates for $\alpha$, $\lambda$, and $\theta$, obtained from 200 Monte Carlo replications across the four sample sizes.
+The histogram of first-goal timings reveals that most goals occur within the first 30–40 minutes of the match. A long right-tail extends beyond this range, signalling the possibility of late breakthroughs, though occurring less frequently. The distribution is strongly right-skewed and lacks multimodal structure, suggesting that scoring does not cluster but instead follows a continuous waiting process. This supports the use of survival-based models and suggests that the hazard rate is unlikely to remain constant over time.
 
-The boxplots reveal the following trends:
+\subsection{Empirical CDF – Home vs Away First Goals}
 
-\begin{itemize}
-    \item For small samples (especially $n=30$), estimates show high variability and numerous outliers.
-    \item As sample size increases, interquartile ranges narrow significantly.
-    \item Median estimates become more stable and closer to each other across replications.
-    \item Variability in $\lambda$ and $\theta$ is highest in small samples, consistent with sensitivity to early-sample variation.
-\end{itemize}
-
-These results empirically validate the \textbf{consistency} of the EM estimators, demonstrating convergence and reduced uncertainty with increasing sample size.
-
-\section{Mean Squared Error vs.\ Sample Size}
-
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
-\includegraphics[width=0.85\textwidth]{mse_vs_n.png}
-\caption{Mean Squared Error (MSE) of EM parameter estimates vs.\ sample size.}
-\label{fig:mse}
+\includegraphics[width=0.8\linewidth]{fig6_2_ecdf.png}
+\caption{Empirical CDF for Home and Away First-Goal Times}
 \end{figure}
 
-Figure~\ref{fig:mse} illustrates the MSE of parameter estimates for $\alpha$, $\lambda$, and $\theta$ calculated across replications for sample sizes 
-\[
-n = 25,\; 50,\; 100,\; 200.
-\]
+The empirical cumulative distribution functions (ECDFs) show that both home and away teams reach around 80–90\% probability of scoring by the 40th minute. The curves rise sharply during the initial phase and flatten thereafter, indicating that early scoring is common while late scoring is sporadic. Away teams appear to score slightly earlier on average, though the curves converge later in the match.
 
-The results show:
+The strong concave rise followed by flattening contradicts the constant hazard assumption of an exponential model and supports more flexible distributions such as Weibull, Gamma and MOGE. The weak negative correlation between $X_1$ (home) and $X_2$ (away) further suggests that scoring processes behave independently, justifying separate modelling.
 
-\begin{itemize}
-    \item MSE decreases consistently as sample size increases, confirming estimator improvement.
-    \item For $n=25$, all parameters exhibit high error, with $\lambda$ showing the largest MSE.
-    \item For $n=100$ and $n=200$, MSE drops sharply, especially for $\alpha$.
-    \item The curves flatten between $n=100$ and $n=200$, suggesting diminishing returns with very large samples.
-\end{itemize}
+% ---------------------------------------------------------
+\subsection{TTT Plot (Total Time on Test)}
 
-Overall, the results validate the consistency and convergence behavior of the EM estimators.
-
-\section{Convergence Behavior of the EM Algorithm}
-
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
-\includegraphics[width=0.8\textwidth]{em_convergence.png}
-\caption{EM algorithm convergence for a simulated dataset ($n=100$).}
-\label{fig:convergence}
+\includegraphics[width=0.8\linewidth]{fig6_3_ttt_home.png}
+\includegraphics[width=0.8\linewidth]{fig6_4_ttt_away.png}
+\caption{TTT plots for Home and Away First-Goal Times}
 \end{figure}
 
-Figure~\ref{fig:convergence} displays the log-likelihood evolution across EM iterations for a simulated dataset of size $n=100$.
-
-Key observations include:
-
-\begin{itemize}
-    \item The log-likelihood increases monotonically, consistent with the theoretical EM property.
-    \item Rapid early improvement is followed by smooth stabilization.
-    \item The algorithm converges in only a few iterations.
-    \item No oscillation or instability is observed, indicating effective initialization and a well-behaved likelihood surface.
-\end{itemize}
-
-This demonstrates that the EM algorithm is computationally efficient and stable for MOGE parameter estimation.
-
-\section{Bootstrapping for Parameter Stability}
-
-A non-parametric bootstrap procedure with 300 bootstrap samples was used to assess estimator stability for both home ($X_1$) and away ($X_2$) first-goal datasets.
-
-Each bootstrap replicate:
-
-\begin{enumerate}
-    \item Resamples the dataset with replacement,
-    \item Re-estimates $(\alpha, \lambda, \theta)$ using EM,
-    \item Records the parameter estimates.
-\end{enumerate}
-
-The results showed:
-
-\begin{itemize}
-    \item Substantial variability across bootstrap replicates, especially in small samples.
-    \item Wider dispersion for away-team estimates compared to home-team estimates.
-    \item Consistency with simulation findings: estimator variability decreases with sample size.
-\end{itemize}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{bootstrap_histograms.png}
-\caption{Bootstrap histograms for $\alpha$, $\lambda$, and $\theta$ (home and away datasets).}
-\label{fig:bootstrap_hist}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{bootstrap_boxplots.png}
-\caption{Bootstrap boxplots comparing home and away parameter distributions.}
-\label{fig:bootstrap_box}
-\end{figure}
-
-These results emphasize the importance of sufficient sample sizes when interpreting MOGE parameters in real-world applications.
-
-\section{Scatter Plot Analysis for Dependency Assessment}
-
-A scatter plot was constructed to evaluate possible dependence between home first-goal times ($X_1$) and away first-goal times ($X_2$) within the same match.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.8\textwidth]{scatter_x1_x2.png}
-\caption{Scatter plot of paired home and away first-goal times.}
-\label{fig:scatter}
-\end{figure}
-
-Correlation coefficients were computed:
+The Total-Time-on-Test plots lie below the diagonal reference line, indicating an Increasing Failure Rate (IFR). This means the likelihood of scoring increases as the match progresses. Home teams show slightly stronger curvature than away teams, suggesting greater attacking momentum as the match unfolds. Away scoring grows more gradually, possibly due to tactical conservatism or defensive setups early in matches.
 
 \[
-\text{Pearson} = -0.0375, \qquad 
-\text{Spearman} = -0.0992, \qquad 
-\text{Kendall} = -0.0694.
+\text{TTT Curve Below Diagonal} \Rightarrow \text{Increasing Hazard Rate (IFR)}
 \]
 
-All values are close to zero and slightly negative, indicating:
+The IFR trend reinforces the suitability of non-memoryless distributions such as Weibull and Gamma, and theoretically also MOGE, for modelling first-goal timings.
 
-\begin{itemize}
-    \item Extremely weak dependence,
-    \item No meaningful trend in the scatter plot,
-    \item No need for bivariate or joint-survival modelling.
-\end{itemize}
+% ---------------------------------------------------------
+\section{Model Fitting and Parameter Estimation}
 
-Thus, modelling $X_1$ and $X_2$ separately using marginal MOGE distributions is statistically justified.
+Three lifetime distributions – Weibull, Gamma and MOGE – were fitted to both $X_1$ and $X_2$ datasets. Weibull and Gamma parameters were estimated using Maximum Likelihood Estimation, whereas MOGE required the Expectation-Maximization (EM) algorithm due to its latent variable structure and three-parameter formulation $(\alpha,\lambda,\theta)$.
 
-\section{Conclusion}
+Model suitability was evaluated using log-likelihood, Kolmogorov–Smirnov (KS) goodness-of-fit statistics and Akaike Information Criterion (AIC), allowing comparison based on distributional fit while accounting for model complexity.
 
-This simulation study evaluated the performance of the MOGE distribution and the EM algorithm in recovering parameters under controlled experimental conditions.
+% ---------------------------------------------------------
+\section{Goodness-of-Fit Results}
 
-Major findings include:
+Goodness-of-fit results revealed that MOGE performed poorly for real data, yielding KS statistics close to 1 with extremely low p-values, leading to strong rejection for both home and away timings. The EM estimator also showed instability, likely due to the small sample size and irregular scoring patterns.
 
-\begin{itemize}
-    \item EM estimators for $(\alpha, \lambda, \theta)$ are consistent and accurate with increasing sample size.
-    \item MSE decreases systematically, particularly for $\alpha$ and $\lambda$.
-    \item Boxplots show shrinking variability and improved estimator stability.
-    \item Log-likelihood convergence is monotonic and rapid.
-    \item Bootstrap results highlight realistic sampling variability in small datasets.
-    \item Dependency analysis confirms that home and away first-goal times are largely independent.
-\end{itemize}
+In contrast, the Weibull distribution achieved the closest fit to empirical scoring behaviour. Gamma also performed well by capturing skewness and tail behaviour, while the Exponential model performed poorly due to its constant hazard assumption.
 
-Overall, the simulation results validate the MOGE distribution as a powerful and reliable model for time-to-event phenomena such as first-goal scoring times in football. The study establishes strong support for applying MOGE to real datasets and sets a foundation for predictive modelling and further research.
+These results indicate that Weibull and Gamma are better suited for real scoring data than MOGE. However, the poor performance of MOGE appears to stem from data limitations rather than theoretical inadequacy. This motivates simulation-based evaluation of MOGE under ideal conditions.
+
+% ---------------------------------------------------------
+\section{Discussion}
+
+The real-data analysis confirms that first-goal arrivals follow a time-dependent scoring process with increasing hazard. The right-skewed distribution, early scoring dominance and IFR behaviour observed through the ECDF and TTT plots align with survival-based scoring interpretations. Weibull and Gamma models performed best empirically, while MOGE struggled due to instability under limited data.
+
+Although MOGE is theoretically flexible and capable of representing complex hazard shapes, the small dataset restricts its estimation stability. With larger or multi-season datasets, MOGE performance may improve substantially. To validate this hypothesis, a simulation study was designed to evaluate estimator behaviour, bias, mean squared error and convergence properties using synthetic data (Chapter 7).
+
+% ---------------------------------------------------------
+\section{Conclusion of Real Data Analysis}
+
+Real first-goal times show heavy concentration in the early match period followed by a long right tail. Hazard rate increases over time, confirming non-memoryless behaviour. ECDF analysis highlights early scoring likelihood, while TTT plots verify IFR behaviour for both home and away teams. Weak correlation between scoring processes supports independent modelling.
+
+Model fitting results show Weibull as the best performing model, followed by Gamma, whereas MOGE was rejected statistically. This does not dismiss the potential of MOGE; instead, it reflects sample limitations. These findings motivated the simulation work in Chapter 7, where synthetic data is used to evaluate MOGE under controlled settings and examine its theoretical strengths.
+
