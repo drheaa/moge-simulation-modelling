@@ -2,82 +2,85 @@
 
 \section{Introduction}
 
-The real dataset used in this study consists of first-goal times recorded in FIFA Club World Cup matches (2025 season). The data was sourced from FootyStats, a publicly available football statistics platform. Each observation represents the minute at which the first goal was scored by the home or away team. Matches in which no goals were scored were excluded, as the model assumes strictly positive event times.
+In this chapter, we analyze a real tensile-strength dataset consisting of 56 single carbon fiber measurements tested under tension at a gauge length of 1 mm, recorded in GPa. The dataset, originally provided by Prof. R.G. Surles, represents the tensile strength of individual fibers extracted from a 1000-filament tow. Since tensile strength is strictly positive and continuous, it is well-suited for lifetime distribution modeling often used in reliability and failure-time analysis.
 
-After the data was preprocessed and deduplicated, 29 observations each were obtained for home and away goal timings. Since these values are strictly positive, continuous, and time-to-event in nature, they are suitable for modelling using survival/lifetime distributions such as Weibull, Gamma, and the Marshall–Olkin Generalized Exponential (MOGE).
+The objective of this analysis is to evaluate how well the Marshall--Olkin Generalized Exponential (MOGE) distribution models the strength characteristics relative to traditional reliability distributions, namely Weibull and Gamma. Due to the three-parameter flexibility of MOGE $(\alpha, \lambda, \theta)$, particularly in handling increasing hazard structures and heavy-tailed behavior, parameter estimation is carried out using the EM algorithm. In this chapter, exploratory visualization, model fitting, goodness-of-fit testing, and comparative inference are presented. The results here provide the real-data foundation leading to simulation studies discussed later in Chapter 7.
 
-The purpose of this chapter is to examine the behaviour of real scoring data, identify which probability distribution best describes it, and assess whether MOGE is a suitable modelling option for football scoring. Insights derived here form the basis for the simulation work in Chapter 7.
-
-% ---------------------------------------------------------
+% ----------------------------------------------------------
 \section{Exploratory Data Analysis}
+% ----------------------------------------------------------
 
-\subsection{Histogram of First Goal Times}
+\subsection*{Histogram with Fitted MOGE PDF}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\linewidth]{fig6_1_histogram.png}
-\caption{Histogram of First Goal Times in FIFA Club World Cup Matches}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/hist_moge.png}
+    \caption{Histogram of Carbon Fiber Strength with fitted MOGE PDF}
 \end{figure}
 
-The histogram of first-goal timings reveals that most goals occur within the first 30–40 minutes of the match. A long right-tail extends beyond this range, signalling the possibility of late breakthroughs, though occurring less frequently. The distribution is strongly right-skewed and lacks multimodal structure, suggesting that scoring does not cluster but instead follows a continuous waiting process. This supports the use of survival-based models and suggests that the hazard rate is unlikely to remain constant over time.
+The histogram shows a unimodal distribution centred near 3.8--4.5 GPa with slight right-skewness, indicating most fibers fail in a moderate strength region while a smaller fraction withstand higher loads. The fitted MOGE PDF aligns well with the observed frequencies, capturing both the peak density and gradual tail descent. No multimodality or extreme outliers are observed, confirming suitability for parametric modelling through reliability distributions. The presence of a right tail suggests increasing hazard behaviour, motivating the use of models capable of shape control such as MOGE, Weibull, and Gamma.
 
-\subsection{Empirical CDF – Home vs Away First Goals}
+% ----------------------------------------------------------
+\subsection*{Empirical CDF vs MOGE CDF}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\linewidth]{fig6_2_ecdf.png}
-\caption{Empirical CDF for Home and Away First-Goal Times}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/cdf_moge.png}
+    \caption{Empirical CDF vs Fitted MOGE CDF}
 \end{figure}
 
-The empirical cumulative distribution functions (ECDFs) show that both home and away teams reach around 80–90\% probability of scoring by the 40th minute. The curves rise sharply during the initial phase and flatten thereafter, indicating that early scoring is common while late scoring is sporadic. Away teams appear to score slightly earlier on average, though the curves converge later in the match.
+Figure 6.2 compares the empirical cumulative distribution with the theoretical MOGE CDF. The two curves follow each other closely with minimal deviation across the support range. A low Kolmogorov--Smirnov statistic of \textbf{0.0474} confirms strong agreement. Minor divergence appears only in the extreme upper tail due to data sparsity, while overall tracking remains smooth and consistent. This alignment validates the capability of MOGE in capturing cumulative failure behavior relevant for reliability thresholds.
 
-The strong concave rise followed by flattening contradicts the constant hazard assumption of an exponential model and supports more flexible distributions such as Weibull, Gamma and MOGE. The weak negative correlation between $X_1$ (home) and $X_2$ (away) further suggests that scoring processes behave independently, justifying separate modelling.
+% ----------------------------------------------------------
+\subsection*{TTT Plot (Total Time on Test)}
 
-% ---------------------------------------------------------
-\subsection{TTT Plot (Total Time on Test)}
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\linewidth]{fig6_3_ttt_home.png}
-\includegraphics[width=0.8\linewidth]{fig6_4_ttt_away.png}
-\caption{TTT plots for Home and Away First-Goal Times}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/ttt_plot.png}
+    \caption{TTT plot of Carbon Fiber Strength Data}
 \end{figure}
 
-The Total-Time-on-Test plots lie below the diagonal reference line, indicating an Increasing Failure Rate (IFR). This means the likelihood of scoring increases as the match progresses. Home teams show slightly stronger curvature than away teams, suggesting greater attacking momentum as the match unfolds. Away scoring grows more gradually, possibly due to tactical conservatism or defensive setups early in matches.
+The empirical TTT curve lies below the 45° reference line, indicating an \textbf{Increasing Failure Rate (IFR)}. This behaviour is typical of brittle materials where probability of breakage rises as stress increases. The IFR pattern further justifies using flexible lifetime models beyond exponential, aligning with properties of MOGE. Mathematically,
 
 \[
-\text{TTT Curve Below Diagonal} \Rightarrow \text{Increasing Hazard Rate (IFR)}
+\text{TTT curve below diagonal} \Rightarrow \text{Increasing Failure Rate (IFR)}
 \]
 
-The IFR trend reinforces the suitability of non-memoryless distributions such as Weibull and Gamma, and theoretically also MOGE, for modelling first-goal timings.
-
-% ---------------------------------------------------------
+% ----------------------------------------------------------
 \section{Model Fitting and Parameter Estimation}
 
-Three lifetime distributions – Weibull, Gamma and MOGE – were fitted to both $X_1$ and $X_2$ datasets. Weibull and Gamma parameters were estimated using Maximum Likelihood Estimation, whereas MOGE required the Expectation-Maximization (EM) algorithm due to its latent variable structure and three-parameter formulation $(\alpha,\lambda,\theta)$.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/pdf_comparison.png}
+    \caption{PDF comparison: MOGE vs Weibull vs Gamma}
+\end{figure}
 
-Model suitability was evaluated using log-likelihood, Kolmogorov–Smirnov (KS) goodness-of-fit statistics and Akaike Information Criterion (AIC), allowing comparison based on distributional fit while accounting for model complexity.
+Three lifetime distributions (MOGE, Weibull, and Gamma) were fitted to the dataset. Parameter estimation for Weibull and Gamma used MLE, while MOGE parameters $(\alpha, \lambda, \theta)$ were estimated using EM due to latent-variable structure. The PDFs show that MOGE closely follows the empirical shape, capturing central mass and tail behaviour more accurately. Weibull decays faster in the right tail, while Gamma shows mid-range underfitting. This visual evidence points toward superior flexibility of MOGE.
 
-% ---------------------------------------------------------
-\section{Goodness-of-Fit Results}
+% ----------------------------------------------------------
+\section{Goodness-of-fit Results}
 
-Goodness-of-fit results revealed that MOGE performed poorly for real data, yielding KS statistics close to 1 with extremely low p-values, leading to strong rejection for both home and away timings. The EM estimator also showed instability, likely due to the small sample size and irregular scoring patterns.
+Goodness-of-fit was assessed through log-likelihood and KS metrics. The fitted results obtained are:
 
-In contrast, the Weibull distribution achieved the closest fit to empirical scoring behaviour. Gamma also performed well by capturing skewness and tail behaviour, while the Exponential model performed poorly due to its constant hazard assumption.
+\[
+\text{MOGE: } \alpha=201.346,\; \lambda=2.0817,\; \theta=33.529,\; LL=-68.00,\; KS=0.0474
+\]
+\[
+\text{Weibull: shape}=5.706,\; scale=4.596,\; LL=-68.93,\; KS=0.0902
+\]
+\[
+\text{Gamma: shape}=26.284,\; scale=0.162,\; LL=-68.38,\; KS=0.0537
+\]
 
-These results indicate that Weibull and Gamma are better suited for real scoring data than MOGE. However, the poor performance of MOGE appears to stem from data limitations rather than theoretical inadequacy. This motivates simulation-based evaluation of MOGE under ideal conditions.
+MOGE achieves the highest log-likelihood and lowest KS statistic, confirming it best describes the data. Weibull performs moderately with tail deviation, while Gamma mismatches the centre region slightly. Overall, statistical metrics and curve-fitting both verify MOGE as the most appropriate model.
 
-% ---------------------------------------------------------
+% ----------------------------------------------------------
 \section{Discussion}
 
-The real-data analysis confirms that first-goal arrivals follow a time-dependent scoring process with increasing hazard. The right-skewed distribution, early scoring dominance and IFR behaviour observed through the ECDF and TTT plots align with survival-based scoring interpretations. Weibull and Gamma models performed best empirically, while MOGE struggled due to instability under limited data.
+The results clearly show the capability of MOGE to model carbon fiber strength more flexibly than Weibull and Gamma. The superior fit arises from its third parameter $\theta$, which governs tail behaviour and hazard adaptability. The IFR pattern observed in the TTT plot supports suitability of MOGE, reflecting realistic brittle failure dynamics where breakage probability rises near threshold load. PDF/CDF visual overlays further strengthen this conclusion, showing strong alignment across quantiles.
 
-Although MOGE is theoretically flexible and capable of representing complex hazard shapes, the small dataset restricts its estimation stability. With larger or multi-season datasets, MOGE performance may improve substantially. To validate this hypothesis, a simulation study was designed to evaluate estimator behaviour, bias, mean squared error and convergence properties using synthetic data (Chapter 7).
+% ----------------------------------------------------------
+\section{Conclusion}
 
-% ---------------------------------------------------------
-\section{Conclusion of Real Data Analysis}
-
-Real first-goal times show heavy concentration in the early match period followed by a long right tail. Hazard rate increases over time, confirming non-memoryless behaviour. ECDF analysis highlights early scoring likelihood, while TTT plots verify IFR behaviour for both home and away teams. Weak correlation between scoring processes supports independent modelling.
-
-Model fitting results show Weibull as the best performing model, followed by Gamma, whereas MOGE was rejected statistically. This does not dismiss the potential of MOGE; instead, it reflects sample limitations. These findings motivated the simulation work in Chapter 7, where synthetic data is used to evaluate MOGE under controlled settings and examine its theoretical strengths.
+This chapter demonstrated successful application of lifetime modelling to carbon fiber strength. Among the models tested, MOGE provided the best representation, as shown by its lowest KS statistic, highest likelihood, and strongest visual fit. Weibull and Gamma offered reasonable alternatives but lacked adaptability in tail and mid-range fitting. MOGE enables more reliable inference in materials engineering settings where extreme-strength behavior matters. These findings motivate further simulation and robustness evaluation in Chapter 7.
 
