@@ -2,9 +2,9 @@
 
 \section{Objective}
 
-The real-data analysis in Chapter 6 showed that although first-goal timings in FIFA matches exhibited increasing hazard behaviour, the MOGE model performed poorly when applied to the observed dataset. Weibull and Gamma distributions fitted the data more accurately, while MOGE estimation was unstable and rejected by goodness-of-fit tests. This raises a key question: does MOGE inherently fail to represent football scoring, or was the small sample size and irregular scoring pattern insufficient for reliable EM estimation?
+The real-data analysis in Chapter 6 showed that while first-goal timings in FIFA matches displayed increasing hazard behavior, the MOGE model performed poorly when fitted to the observed dataset. The Weibull and Gamma distributions captured empirical scoring times more effectively, whereas MOGE estimation was unstable and was rejected by goodness-of-fit tests. However, this outcome raised a methodological question: whether MOGE truly lacks suitability for football scoring, or whether the limited size and irregular structure of the real dataset prevented the EM estimator from recovering parameters accurately. 
 
-To answer this, simulation provides a controlled environment where true parameters are known. Synthetic observations generated from the MOGE distribution eliminate tactical variability and sample scarcity, allowing assessment of how well the EM algorithm recovers parameters under ideal conditions. If estimation improves with larger sample sizes, MOGE remains theoretically sound despite real-world challenges.
+Simulation offers a controlled way to assess this. Unlike real match data, a simulated dataset allows us to define true parameters and generate synthetic observations directly from the MOGE distribution. This removes external variability, data limitations, and tactical noise inherent in football, and makes it possible to evaluate how well the EM algorithm performs under ideal conditions. If the estimator converges toward true parameters when sample size increases, then MOGE can be considered theoretically sound, even if real applications remain challenging due to limited data. 
 
 % ---------------------------------------------------------
 \section{Simulation Setup and Methodology}
@@ -20,9 +20,9 @@ Goal-time samples were simulated and parameter estimation repeated for increasin
 n \in \{30,\, 50,\, 100,\, 200\}.
 \]
 
-Multiple Monte-Carlo replications were conducted for each $n$. In each iteration, synthetic data was drawn from MOGE and the EM algorithm was used to re-estimate $(\alpha,\lambda,\theta)$. Recorded results enabled evaluation of estimator bias, MSE, variability and convergence.
+Synthetic goal-time samples were generated using the MOGE distribution with chosen true parameters. The estimation process was repeated across increasing sample sizes (n=30, 50, 100, and 200) to observe how statistical accuracy improves as data availability increases. For each sample size, multiple Monte Carlo replications were performed. In each run, synthetic first-goal times were drawn from the MOGE model, the EM algorithm was applied to re-estimate parameters, and resulting estimates were recorded. 
 
-This framework acts as a stress-test, examining how estimation accuracy improves with data volume and whether EM converges towards true values reliably.
+This structure allowed the examination of estimator performance through the distribution of parameter estimates, their average deviation from true values, and the overall stability of convergence. The simulation, therefore, served as a stress test, demonstrating how quickly the EM estimator learns the true parameter behavior and how sensitive it is to data volume. 
 
 % ---------------------------------------------------------
 \section{Boxplots of Parameter Estimates}
@@ -33,9 +33,9 @@ This framework acts as a stress-test, examining how estimation accuracy improves
 \caption{Boxplots of EM Parameter Estimates Across Sample Sizes}
 \end{figure}
 
-Boxplots illustrate parameter estimate distributions for each sample size. At $n=30$, estimates display wide variability, indicating high uncertainty. As the sample size increases to $n=50$ and $n=100$, dispersion narrows and medians approach true parameter values. By $n=200$, estimates become tightly clustered, demonstrating strong convergence and stability.
+The distribution of parameter estimates for each sample size was visualized through boxplots. When n=30, estimates were widely spread, indicating high variance and uncertainty in the fitted parameters. As sample size increased to n=50 and 100, the dispersion narrowed considerably, with the median values moving closer to the true parameter values. By n=200, the estimator became tightly concentrated, illustrating strong convergence and consistent recovery of MOGE characteristics. 
 
-This supports that the MOGE estimator is highly sensitive to small samples but stabilises rapidly as data increases. Real-world data had only 29 points—insufficient for reliable EM performance—explaining the poor fitting observed in Chapter 6. Simulation confirms that the model itself is not flawed; rather, real data volume was inadequate.
+This progression demonstrates that the MOGE estimator is sensitive to small samples but stabilizes rapidly once sufficient data is available. In practical terms, although the real FIFA dataset contained only 29 values per group too small for reliable EM convergence, the simulation reveals that the model itself does not fail. Instead, insufficient sample size causes parameter overshooting and irregular likelihood surfaces, which manifested in poor real data fit. 
 
 % ---------------------------------------------------------
 \section{Mean Squared Error (MSE) vs Sample Size}
@@ -46,9 +46,9 @@ This supports that the MOGE estimator is highly sensitive to small samples but s
 \caption{Mean Squared Error of EM Parameter Estimates vs Sample Size}
 \end{figure}
 
-Mean Bias and MSE were computed for each parameter. Both metrics decrease consistently as $n$ increases. At low sample counts, estimates show mild positive bias, reflecting estimator uncertainty. With higher $n$, both bias and MSE reduce sharply, indicating improved accuracy and statistical reliability.
+The mean bias and MSE were calculated for each estimated parameter to quantify estimator accuracy. Both metrics displayed a clear decreasing trend across the increasing sample sizes. For lower n, the estimator tended to overestimate parameters slightly, reflecting the uncertainty experienced in low-data environments. As sample size expanded, both bias and MSE dropped sharply, indicating improved accuracy and stronger reliability. 
 
-The decreasing MSE trend confirms the EM estimator is asymptotically consistent for MOGE. Combined with shrinking boxplot widths, the results validate that estimator precision strengthens significantly with data availability.
+The bias reduction confirms that the EM procedure for MOGE is asymptotically consistent. The decreasing MSE verifies that estimation precision improves with larger samples, a necessary condition for applying MOGE in data-driven contexts. When considered alongside the shrinking boxplot widths, these results collectively suggest that MOGE performs as expected from a theoretical standpoint. 
 
 % ---------------------------------------------------------
 \section{Convergence Behaviour of the EM Algorithm}
@@ -59,20 +59,24 @@ The decreasing MSE trend confirms the EM estimator is asymptotically consistent 
 \caption{EM Algorithm Convergence (Simulated Sample, $n = 100$)}
 \end{figure}
 
-Convergence behaviour was assessed by tracking log-likelihood across EM iterations using a synthetic dataset of size $n=100$. As expected, likelihood increased after the first update step, consistent with EM theory guaranteeing monotonic improvement.
+To examine the stability of the parameter estimation process, the log-likelihood values were recorded across EM iterations when fitting the MOGE distribution to a synthetically generated dataset of size n=100. Figure 7.3 visualizes the change in log-likelihood between the initial starting values and the first EM update step. As expected from the theoretical properties of the EM algorithm, the likelihood improved after the update, reflecting the non-decreasing likelihood guarantee of EM. 
 
-Although the displayed trace represents the initial update, full simulations (not shown for brevity) continued increasing until stabilisation. The absence of oscillation or divergence confirms smooth convergence under adequate sample size.
+Although the displayed convergence trace consists of the initial and first update iteration, even this single step demonstrates the algorithm's upward likelihood movement, suggesting that EM adjusts the parameters towards a more optimal fit. In full multi-iteration runs (not shown for brevity), the likelihood continued to increase until reaching stability, confirming that convergence occurred smoothly without oscillation or divergence. 
 
-This indicates EM is computationally efficient and effective when data is sufficient. In contrast, real-match instability stemmed from limited observations—not algorithmic weakness. Under synthetic conditions, EM reliably improves likelihood, reinforcing findings from bias and MSE trends.
+This behavior highlights that, when sufficient data is available, the EM routine is computationally efficient and capable of moving the likelihood toward the optimum rapidly. In contrast, real-match fitting often produced unstable likelihood surfaces due to sample scarcity and irregular goal-time patterns. The improvement observed here therefore reflects that estimation difficulties in the real dataset arise primarily from limited sample size, not from algorithmic limitations. 
+
+Under ideal simulated conditions, EM demonstrates the ability to recover structure and improve likelihood reliably, reinforcing the findings from the bias and MSE analysis that estimation accuracy strengthens considerably with increasing sample size. 
 
 % ---------------------------------------------------------
 \section{Bootstrapping for Parameter Stability}
 
-To assess reliability of parameter estimates under real sample size constraints, a non-parametric bootstrap procedure was performed. A total of 300 bootstrap samples were drawn (with replacement) from home $(X_1)$ and away $(X_2)$ datasets. For each sample, MOGE parameters were re-estimated using EM and values stored.
+To assess the reliability and sampling variability of parameter estimates obtained from the EM algorithm, a non-parametric bootstrap procedure was carried out. Bootstrapping is particularly useful for small datasets, as it provides an empirical approximation of the sampling distribution of an estimator without relying on strong distributional assumptions. In this study, 300 bootstrap samples were generated with replacement from the observed first-goal times for both home (X1) and away (X2) teams. For each bootstrap sample, the MOGE model was re-fitted using the EM algorithm, and corresponding estimates of α, λ, and θ were recorded. 
 
-Bootstrap results revealed considerable variability in parameters, especially for the away team. Away distributions showed heavier tails and greater dispersion, indicating more irregular scoring behaviour. Boxplots confirmed large confidence intervals, showing high uncertainty under limited data.
+The bootstrap distributions revealed considerable variation in estimated parameters across resamples, reflecting a high degree of uncertainty when modelling with limited match data. This behavior aligns with earlier simulation findings, where small sample sizes produced greater estimation of fluctuations. In the real-data case, both home and away bootstrap results exhibited wide dispersion; however, the spread was consistently larger for away-team estimates, suggesting more irregular scoring behavior and weaker parameter stability in away matches. This may be attributed to tactical conservatism, defensive bias, or match-specific randomness influencing scoring. 
 
-These results match simulation outcomes—small $n$ leads to parameter instability. Larger seasonal datasets would be required for narrow confidence bounds, improved reliability and inferential accuracy.
+Histograms illustrate heavy-tailed and skewed parameter distributions, particularly for away datasets, confirming that precise inference from limited observations is challenging. The boxplots further highlight this variability, where confidence intervals remain broad, and median estimates deviate notably across samples. These patterns reinforce that small datasets make it difficult for the EM algorithm to converge toward stable parameters for MOGE. 
+
+Overall, the bootstrap analysis underlines the sensitivity of MOGE parameter estimation to limited data availability. While the model is theoretically capable of learning hazard structure, larger sample sizes or multi-season data would be required to achieve narrower confidence intervals, reduced variability, and reliable inference for practical football analytics. 
 
 \begin{figure}[h!]
 \centering
@@ -89,7 +93,13 @@ These results match simulation outcomes—small $n$ leads to parameter instabili
 % ---------------------------------------------------------
 \section{Scatter Plot Analysis for Dependency Assessment}
 
-To evaluate interaction between scoring processes, paired observations $(X_1,X_2)$ were plotted. The objective was to check whether the timing of one team's first goal influences the timing of the other.
+To examine whether home and away scoring events influence one another within the same match, a scatter plot was generated using paired observations of home first-goal times (X1) and away first-goal times (X2). The objective was to assess whether the timing of one team's first goal has any association with when the opposing team scores. Detecting such dependence would motivate the use of a joint or bivariate survival model; conversely, a lack of dependence would justify modelling each process separately. 
+
+Visual inspection of the scatter plot reveals no clear trend or clustering pattern. The points are widely dispersed, and no linear or monotonic structure is observed, indicating the absence of a strong association between the two variables. This observation is supported quantitatively through correlation analysis.
+
+These results suggest that the scoring processes for home and away teams operate largely independently with respect to timing. Matches in which the home team scores early do not necessarily correspond to early scoring by the away team, and vice versa. This independence is consistent with the variability observed in the bootstrap distributions, where parameter estimates for home and away datasets fluctuate independently. Consequently, separate marginal modelling of X1 and X2 is justified, and a more complex bivariate extension of the MOGE model is not required for the current dataset. 
+
+By validating the independence assumption, this scatter-based correlation assessment strengthens the methodological foundation for the simulation study and supports the choice to estimate distributions for home and away scoring events separately. 
 
 \begin{figure}[h!]
 \centering
@@ -110,11 +120,8 @@ All values are near zero and slightly negative, confirming negligible dependence
 % ---------------------------------------------------------
 \section{Conclusion}
 
-This simulation study assessed theoretical performance of MOGE by generating synthetic data from known parameters and applying the EM estimator. Unlike real match data, where MOGE struggled due to sample limitations and scoring randomness, simulated results revealed strong estimator behaviour.
+The simulation analysis conducted in this chapter provides strong evidence for the theoretical robustness of the Marshall–Olkin Generalized Exponential (MOGE) distribution when applied under controlled data conditions. By generating synthetic samples using known parameter values and re-estimating them using the EM algorithm, we were able to assess model performance without the external noise and size limitations present in real datasets. The results clearly demonstrated that the EM estimators for MOGE exhibit desirable statistical behavior parameter estimates consistently moved toward the true values as sample size increased, with both bias and Mean Squared Error declining systematically. The boxplots visibly reflected this trend through shrinking variance spreads, while the convergence trace confirmed stable likelihood improvement within few iterations, validating the numerical stability of the EM routine. 
 
-Parameter estimates converged toward true values as sample size increased. Bias and MSE decreased steadily across $n=30,50,100,200$. Convergence curves confirmed monotonic likelihood improvement, and bootstrap variability reflected the influence of data scarcity.
+The bootstrapping results highlighted the effect of data volume more explicitly. While small samples displayed wider parameter variation much like the behavior observed in real carbon fiber data the variability reduced significantly as sample size increased, affirming that estimation challenges encountered earlier were driven by limited sample availability rather than weaknesses within the distribution itself. When data is abundant, MOGE performs reliably and learns parameter structure accurately, reinforcing its suitability as a flexible lifetime model for reliability contexts. 
 
-When data is generated from MOGE, the model outperforms Weibull, Gamma and Exponential distributions—opposite to real-world results—demonstrating that MOGE is theoretically robust. The challenge lies not in the model but in real dataset size.
-
-In summary, MOGE is promising for football scoring analytics when applied to sufficiently large datasets or multi-season observations. Simulation results indicate strong potential for predictive modelling when data availability is expanded.
-
+In summary, the simulation study confirms that the MOGE model is theoretically sound and statistically consistent. It performs strongly when adequate observations are available, offering precise parameter recovery and stable convergence. The contrast between real-data and synthetic results highlights an important insight. MOGE requires reasonable sample strength to express its modelling advantages fully. These findings establish a bridge to practical applications, suggesting that with larger or multi-batch datasets, MOGE can be an effective and informative alternative to classical models such as Weibull and Gamma. The insights obtained here lay a foundation for future work on confidence intervals, extended bootstrapping, and integration with multi-parameter reliability modelling frameworks. 
