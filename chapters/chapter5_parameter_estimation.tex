@@ -2,31 +2,24 @@
 % CHAPTER 5: PARAMETER ESTIMATION
 %=========================================================
 
-
 \chapter{Parameter Estimation}
 \label{chap:estimation}
 
-
 In this chapter, we derive the maximum likelihood estimators (MLEs) of the unknown
 parameters of the Marshall--Olkin Generalized Exponential (MOGE) distribution.
-We first develop the observed-data log-likelihood and compute the corresponding
-score equations. Next, we establish theoretical properties of the MLE of the
-shape parameter $\alpha$. We then introduce the complete-data formulation
-with the latent variable $Z$ and derive the EM algorithm following the
-framework presented in the original papers by Risti\'{c} and Kundu (2015)
-and Song, Fan and Kalbfleisch (2005). Short explanatory remarks are included
-to clarify the main steps.
+We begin by formulating the observed-data log-likelihood and associated score
+equations. We then construct the complete-data likelihood by introducing a latent
+variable $Z$, which enables the implementation of an EM algorithm. This chapter
+focuses on the estimation procedure rather than theoretical properties of the MLEs.
 
 
 %=========================================================
 \section{Observed Log-Likelihood Function}
 %=========================================================
 
-
-Let $X_1, X_2, \ldots, X_n$ be a complete sample from the
+Let $X_1,\ldots,X_n$ be a sample from the 
 $\mathrm{MOGE}(\alpha,\lambda,\theta)$ distribution.
 The observed-data log-likelihood is
-
 
 \begin{equation}
 \label{eq:loglik}
@@ -36,37 +29,29 @@ n \log(\alpha\lambda\theta)
 -
 \lambda \sum_{i=1}^n x_i
 +
-(\alpha-1) \sum_{i=1}^n \log(1-e^{-\lambda x_i})
+(\alpha - 1)\sum_{i=1}^n \log(1 - e^{-\lambda x_i})
 -
-2 \sum_{i=1}^n
-\log\!\bigl(\theta + (1-\theta)(1-e^{-\lambda x_i})^\alpha \bigr).
+2\sum_{i=1}^n
+\log\!\left(
+\theta + (1-\theta)(1-e^{-\lambda x_i})^\alpha
+\right).
 \end{equation}
 
-
-\noindent
-\textbf{Remark.}
-This expression is obtained by applying $\log(\cdot)$ to the MOGE density
-and summing term-wise over the sample. The last term arises from the
-Marshall--Olkin shock-formation structure.
+\noindent\textbf{Remark.}
+The final term reflects the Marshall--Olkin shock mechanism and is
+responsible for the nonlinear dependence on $\theta$ and $\alpha$.
 
 
 %=========================================================
 \section{Score Equations}
 %=========================================================
 
-
-The score equations are obtained by setting
-$
-\partial \ell/\partial \lambda = 0,\,
-\partial \ell/\partial \alpha = 0,\,
-\partial \ell/\partial \theta = 0.
-$
-
+The score equations follow from differentiating \eqref{eq:loglik} with respect
+to $(\lambda,\alpha,\theta)$.
 
 %---------------------------------------------------------
 \subsection{Derivative with respect to $\lambda$}
 %---------------------------------------------------------
-
 
 \begin{align}
 \frac{\partial \ell}{\partial \lambda}
@@ -84,31 +69,20 @@ $
 2(1-\theta)\alpha
 \sum_{i=1}^n
 \frac{
-x_i e^{-\lambda x_i}
-\,(1-e^{-\lambda x_i})^{\alpha-1}
+x_i e^{-\lambda x_i}(1-e^{-\lambda x_i})^{\alpha - 1}
 }{
 \theta + (1-\theta)(1-e^{-\lambda x_i})^\alpha
 }.
 \label{eq:score_lambda}
 \end{align}
 
-
-\noindent
-\textbf{Remark.}
-The first two terms come from differentiating
-$n\log\lambda - \lambda \sum x_i$, while the last two follow from
-the chain rule applied to the terms involving $\log(1 - e^{-\lambda x_i})$
-and $\log(\theta+(1-\theta)A_i^\alpha)$.
-
-
 %---------------------------------------------------------
 \subsection{Derivative with respect to $\alpha$}
 %---------------------------------------------------------
 
-
 \begin{align}
 \frac{\partial \ell}{\partial \alpha}
-&=
+=
 \frac{n}{\alpha}
 +
 \sum_{i=1}^n \log(1-e^{-\lambda x_i})
@@ -116,25 +90,24 @@ and $\log(\theta+(1-\theta)A_i^\alpha)$.
 2(1-\theta)
 \sum_{i=1}^n
 \frac{
-(1-e^{-\lambda x_i})^{\alpha} \log(1-e^{-\lambda x_i})
+(1-e^{-\lambda x_i})^\alpha
+\log(1-e^{-\lambda x_i})
 }{
-\theta + (1-\theta)(1-e^{-\lambda x_i})^{\alpha}
+\theta+(1-\theta)(1-e^{-\lambda x_i})^\alpha
 }.
 \label{eq:score_alpha}
 \end{align}
 
-
 %---------------------------------------------------------
 \subsection{Derivative with respect to $\theta$}
 %---------------------------------------------------------
-
 
 \begin{equation}
 \frac{\partial \ell}{\partial \theta}
 =
 \frac{n}{\theta}
 -
-2 \sum_{i=1}^n
+2\sum_{i=1}^n
 \frac{
 1 - (1-e^{-\lambda x_i})^\alpha
 }{
@@ -143,85 +116,37 @@ and $\log(\theta+(1-\theta)A_i^\alpha)$.
 \label{eq:score_theta}
 \end{equation}
 
-
-\noindent
-\textbf{Remark.}
-The dependence on $\theta$ appears only through the final term of the
-log-likelihood, hence the simplified form of~\eqref{eq:score_theta}.
+\noindent\textbf{Remark.}
+These equations do not yield closed-form solutions, motivating the EM
+algorithm developed later in the chapter.
 
 
 %=========================================================
-\section{Properties of the MLE of $\alpha$}
+\section{Complete-Data Likelihood and Latent Structure}
 %=========================================================
 
-
-Let
-\[
-\psi = -\frac{1}{n} \sum_{i=1}^n \log(1-e^{-\lambda x_i}) > 0.
-\]
-
-
-We restate the result of Risti\'{c} and Kundu (2015):
-
-
-\begin{theorem}
-    \label{thm:alpha_root}
-    Let $\alpha$ denote the true parameter.
-    If $0 < \theta < 1$, then the equation
-    \[
-    \frac{\partial \ell}{\partial \alpha} = 0
-    \]
-    has exactly one solution.
-    If $\theta > 1$, then the solution lies in the interval
-    \[
-    \bigl[(2\theta - 1)^{-1} \psi^{-1},\; \psi^{-1} \bigr].
-    \]
-    \end{theorem}
-   
-    \begin{proof}
-    Omitted for brevity; the proof follows by analyzing the monotonicity of the
-    score function~\eqref{eq:score_alpha} and applying boundary limits
-    as $\alpha \to 0^{+}$ and $\alpha \to \infty$.
-    \end{proof}
-   
-    \noindent\textbf{Remark.}
-    This ensures numerical stability when solving for $\alpha$ in the EM algorithm.
-   
-
-
-%=========================================================
-\section{Complete-Data Likelihood and Latent Variable Structure}
-%=========================================================
-
-
-The core idea behind the EM algorithm is to augment the sample
-with an unobservable variable $Z$. The joint pdf of $(X,Z)$ is
-
+To enable EM estimation, the MOGE model is augmented with a latent variable $Z$,
+leading to the joint density
 
 \begin{equation}
 \label{eq:jointpdf}
 f(x,z;\alpha,\lambda,\theta)
 =
-\frac{\alpha \lambda \theta e^{-\lambda x}(1-e^{-\lambda x})^{\alpha-1}}
-{
-\left(1-(1-e^{-\lambda x})^\alpha\right)^2
+\frac{
+\alpha\lambda\theta\,
+e^{-\lambda x}(1-e^{-\lambda x})^{\alpha - 1}
+}{
+(1-(1-e^{-\lambda x})^\alpha)^2
 }
-\,
 \exp\!\left[
--z\left(
-\theta - 1 + (1-(1-e^{-\lambda x})^\alpha)^{-1}
-\right)
+-z\Bigl(\theta - 1 + (1-(1-e^{-\lambda x})^\alpha)^{-1}\Bigr)
 \right].
-\tag{7}
 \end{equation}
 
-
-Summing the log of~\eqref{eq:jointpdf} over $i=1,\ldots,n$ gives
-the complete-data log-likelihood:
-
+The corresponding complete-data log-likelihood is
 
 \begin{align}
-\ell(\alpha,\lambda,\theta; \{x_i,z_i\})
+\ell_c(\alpha,\lambda,\theta)
 &=
 n\log\alpha
 +
@@ -229,31 +154,29 @@ n\log\lambda
 +
 n\log\theta
 -
-\lambda \sum_{i=1}^n x_i
+\lambda\sum_{i=1}^n x_i
 +
-(\alpha-1)\sum_{i=1}^n \log(1-e^{-\lambda x_i})
+(\alpha - 1)\sum_{i=1}^n\log(1-e^{-\lambda x_i})
 \nonumber\\
 &\quad
--2\sum_{i=1}^n\log\left(1-(1-e^{-\lambda x_i})^\alpha\right)
--\sum_{i=1}^n z_i\left[
-\theta - 1 + (1-(1-e^{-\lambda x_i})^\alpha)^{-1}
-\right].
-\tag{8}
+-2\sum_{i=1}^n\log\!\left(1-(1-e^{-\lambda x_i})^\alpha\right)
+-\sum_{i=1}^n
+z_i\left[\theta - 1 + (1-(1-e^{-\lambda x_i})^\alpha)^{-1}\right].
+\label{eq:complete_ll}
 \end{align}
 
-
-\noindent
-\textbf{Remark.}  
+\noindent\textbf{Key observation.}
 Maximization with respect to $\theta$ separates cleanly:
 \[
-\frac{\partial \ell}{\partial\theta}
+\frac{\partial \ell_c}{\partial\theta}
 =
 \frac{n}{\theta}
 -
-\sum_{i=1}^n z_i,
-\quad
-\Rightarrow\quad
-\hat\theta = \frac{n}{\sum z_i}.
+\sum_{i=1}^n z_i
+\quad\Rightarrow\quad
+\hat{\theta}
+=
+\frac{n}{\sum_{i=1}^n z_i}.
 \]
 
 
@@ -261,16 +184,11 @@ Maximization with respect to $\theta$ separates cleanly:
 \section{Decomposition into \texorpdfstring{$g_1$}{g1} and \texorpdfstring{$g_2$}{g2}}
 %=========================================================
 
-
-Define
+Define the function
 \[
-g(\alpha,\lambda)
-=
-g_1(\alpha,\lambda) + g_2(\alpha,\lambda),
-\tag{10}
+g(\alpha,\lambda) = g_1(\alpha,\lambda) + g_2(\alpha,\lambda),
 \]
 where
-
 
 \begin{align}
 g_1(\alpha,\lambda)
@@ -279,82 +197,73 @@ n\ln\alpha
 +
 n\ln\lambda
 -
-\lambda \sum_{i=1}^n x_i
+\lambda\sum_{i=1}^n x_i
 +
-(\alpha-1)\sum_{i=1}^n \log(1-e^{-\lambda x_i}),
-\tag{11}
-\\[6pt]
+(\alpha - 1)\sum_{i=1}^n\log(1-e^{-\lambda x_i}),
+\\[4pt]
 g_2(\alpha,\lambda)
 &=
--2\sum_{i=1}^n
-\log\left(1-(1-e^{-\lambda x_i})^\alpha\right)
+-2\sum_{i=1}^n\log\!\bigl(1-(1-e^{-\lambda x_i})^\alpha\bigr)
 -
-\sum_{i=1}^n z_i (1-(1-e^{-\lambda x_i})^\alpha)^{-1}.
-\tag{12}
+\sum_{i=1}^n z_i(1-(1-e^{-\lambda x_i})^\alpha)^{-1}.
 \end{align}
 
+This decomposition allows fixed-point updates for $(\alpha,\lambda)$.
+
 
 %=========================================================
-\section{Fixed-Point Optimization for \texorpdfstring{$(\alpha,\lambda)$}{(alpha,lambda)}}
+\section{Fixed-Point Optimization for $(\alpha,\lambda)$}
 %=========================================================
 
-
-We solve the system
+The system to be solved at iteration $m$ is
 \[
-g'_1(\alpha,\lambda)
+g_1'(\alpha,\lambda)
 =
--g'_2(\alpha^{(m)},\lambda^{(m)}).
-\tag{13}
+-g_2'(\alpha^{(m)},\lambda^{(m)}).
 \]
 
-
 %---------------------------------------------------------
-\subsection{Initial Fixed-Point Equation}
+\subsection{Initial Fixed-Point Updates}
 %---------------------------------------------------------
 
+Solving $g_{1,\lambda} = 0$ yields the fixed-point update
 
-Solving $g_{1,\lambda}=0$ yields the iterative scheme
 \begin{equation}
 \boxed{
 \lambda
 =
 \left[
 \frac{1}{n}\sum_{i=1}^n \frac{x_i e^{-\lambda x_i}}{1-e^{-\lambda x_i}}
-\left(1+\frac{n}{\sum_{j=1}^n\log(1-e^{-\lambda x_j})}\right)
+\left(1+\frac{n}{\sum_{j=1}^n \log(1-e^{-\lambda x_j})}\right)
 +
 \frac{1}{n}\sum_{i=1}^n x_i
 \right]^{-1}
 }
-\tag{15}
 \end{equation}
 
+with corresponding update
 
-and the corresponding update for $\alpha$:
 \begin{equation}
 \boxed{
 \alpha
 =
 -\frac{n}{\sum_{i=1}^n\log(1-e^{-\lambda x_i})}.
 }
-\tag{16}
 \end{equation}
 
 
 %---------------------------------------------------------
-\subsection{General Fixed-Point Update}
+\subsection{General Fixed-Point Updates}
 %---------------------------------------------------------
 
-
-Define constants
+Let
 \[
 c_1 = -g_{2,\alpha}(\alpha^{(m)},\lambda^{(m)}),
 \qquad
 c_2 = -g_{2,\lambda}(\alpha^{(m)},\lambda^{(m)}).
 \]
 
-
-Then the general update equations (solving $g_{1}' = (c_1,c_2)$) are:
-
+Then the updated values satisfy
 
 \begin{equation}
 \boxed{
@@ -369,13 +278,12 @@ Then the general update equations (solving $g_{1}' = (c_1,c_2)$) are:
 1-\frac{n}{c_1 - \sum_{i=1}^n\log(1-e^{-\lambda x_i})}
 \right)
 \left(
-\frac{1}{n}\sum_{i=1}^n \frac{x_i e^{-\lambda x_i}}{1-e^{-\lambda x_i}}
+\frac{1}{n}\sum_{i=1}^n
+\frac{x_i e^{-\lambda x_i}}{1-e^{-\lambda x_i}}
 \right)
 \right]^{-1}
 }
-\tag{20}
 \end{equation}
-
 
 \begin{equation}
 \boxed{
@@ -387,7 +295,6 @@ c_1 - \sum_{i=1}^n\log(1-e^{-\lambda x_i})
 }{n}
 \right]^{-1}.
 }
-\tag{21}
 \end{equation}
 
 
@@ -395,9 +302,7 @@ c_1 - \sum_{i=1}^n\log(1-e^{-\lambda x_i})
 \section{EM Algorithm for the MOGE Model}
 %=========================================================
 
-
-The E-step requires the conditional expectation:
-
+The conditional expectation required in the E-step is
 
 \begin{equation}
 \boxed{
@@ -409,57 +314,30 @@ E(Z\mid X=x;\alpha,\lambda,\theta)
 \theta + (1-\theta)(1-e^{-\lambda x})^\alpha
 }
 }
-\tag{22}
 \end{equation}
-
 
 Let
 \[
-z_i^{(k)}
-=
-E(Z\mid X=x_i;\alpha^{(k)},\lambda^{(k)},\theta^{(k)}),
-\tag{23}
+z_i^{(k)} = E(Z\mid X=x_i;\alpha^{(k)},\lambda^{(k)},\theta^{(k)}).
 \]
-
-
-which is substituted into the complete-data log-likelihood.
-
 
 %---------------------------------------------------------
 \subsection{E-step}
 %---------------------------------------------------------
 
-
-Compute
-\[
-z_i^{(k)}
-=
-E(Z\mid x_i;\alpha^{(k)},\lambda^{(k)},\theta^{(k)}).
-\]
-
-
-Replace $z_i$ in~\eqref{eq:jointpdf} and~(8) by $z_i^{(k)}$.
-
+Compute all $z_i^{(k)}$ and substitute them into the complete-data
+log-likelihood \eqref{eq:complete_ll}.
 
 %---------------------------------------------------------
 \subsection{M-step}
 %---------------------------------------------------------
 
-
-Update:
-
-
 \[
-\theta^{(k+1)}
-=
-\frac{n}{\sum_{i=1}^n z_i^{(k)}}.
+\theta^{(k+1)} = \frac{n}{\sum_{i=1}^n z_i^{(k)}}.
 \]
 
-
-Compute $c_1$ and $c_2$ from $g_2$ at
-$(\alpha^{(k)},\lambda^{(k)})$,
-then update $(\alpha,\lambda)$ using (20)–(21).
-
+Compute $c_1, c_2$ from $g_2$ at $(\alpha^{(k)},\lambda^{(k)})$ and update
+$(\alpha,\lambda)$ using the fixed-point equations above.
 
 Iterate until convergence.
 
@@ -468,15 +346,7 @@ Iterate until convergence.
 \section{Summary}
 %=========================================================
 
-
-This chapter developed the complete maximum likelihood estimation framework
-for the MOGE distribution, beginning with the observed-data likelihood,
-then establishing the mathematical properties of the score equations,
-followed by the derivation of the complete-data likelihood and EM algorithm.
-The resulting parameter estimation algorithm is efficient and avoids a
-full three-dimensional numerical optimization.
-
-
-
-
-
+This chapter developed the complete likelihood-based estimation procedure for the
+MOGE distribution. The EM algorithm avoids full three-dimensional optimization by
+separating the update for $\theta$ and applying fixed-point iterations for $(\alpha,\lambda)$.
+The resulting method is efficient, stable, and well suited for numerical implementation.

@@ -1,27 +1,30 @@
-# Ignore all LaTeX build files
+# LaTeX build files
 *.aux
 *.bbl
 *.blg
 *.brf
-*.fdb_latexmk
 *.fls
+*.fdb_latexmk
 *.log
 *.out
 *.toc
 *.lof
 *.lot
 *.synctex.gz
-*.gz
 *.nav
 *.snm
 *.vrb
 
-# Ignore generated PDFs
-*.pdf
+# Python cache
+__pycache__/
+*.pyc
 
-# VS Code settings that shouldn’t be committed
+# Jupyter
+.ipynb_checkpoints/
+
+# VSCode
 .vscode/
 
-# macOS, Windows junk
+# OS junk
 .DS_Store
 Thumbs.db
