@@ -1,40 +1,26 @@
 \chapter{Introduction}
 
-Lifetime and reliability data appear frequently in engineering, medicine, survival
-studies, and industrial applications. Classical models such as the Exponential,
-Weibull, or Gamma distributions are commonly used due to their mathematical
-tractability and interpretability. However, in practice, these classical models fail
-to capture many important hazard-rate shapes, especially non-monotonic failure
-patterns. Many real-world systems exhibit bathtub-shaped or inverted bathtub
-hazard functions—patterns that traditional exponential-type models cannot
-adequately represent.
+Engineering, medical studies, and survival analysis all revolve around the modelling of
+lifetime and reliability data. While classical models such as the Exponential, Weibull,
+and Gamma distributions are mathematically convenient, they often fail to capture the
+non-monotonic hazard trends observed in real systems \citep{chugani2025a,chugani2025b}.
+Many practical scenarios exhibit early-failure phases, wear-out periods, or complex
+bathtub-shaped hazard behaviour that require more flexible distributional forms
+\citep{gfg2025}.
 
-To overcome these limitations, Marshall and Olkin (1997) introduced a general
-method for adding an extra parameter to an existing distribution family. Their
-construction allows greater flexibility while retaining mathematical tractability.
-Building on this idea, Ristić and Kundu (2015) proposed the
-\textit{Marshall–Olkin Generalized Exponential (MOGE)} distribution. This model
-extends the two-parameter Generalized Exponential (GE) distribution by
-introducing an additional parameter $\theta$, resulting in a more flexible
-three-parameter family.
+To address these limitations, Marshall and Olkin \citep{marshall1997} proposed a general
+method for enriching an existing distribution by introducing an additional parameter.
+Building on this framework, Risti\'c and Kundu \citep{ristic2015} developed the
+Marshall--Olkin Generalized Exponential (MOGE) distribution, a three-parameter extension
+of the Generalized Exponential model capable of representing all major hazard-rate
+shapes. Its tractability and flexibility make the MOGE distribution a promising candidate
+for modelling complex lifetime data.
 
-The MOGE distribution is capable of generating a wide range of density shapes
-and supports all four primary hazard-rate behaviours:
-
-\begin{itemize}
-    \item increasing,
-    \item decreasing,
-    \item bathtub-shaped,
-    \item upside-down bathtub shaped.
-\end{itemize}
-
-Because of this versatility, the MOGE model is a valuable tool for analyzing
-complex lifetime data where simpler models fail. Despite its flexibility, the
-distribution maintains a compact and tractable analytical form, making it suitable
-for parameter estimation and for modeling censored lifetime data.
-
-This study revisits and summarizes the theoretical structure of the MOGE
-distribution, focusing particularly on parameter estimation using the
-Expectation–Maximization (EM) algorithm. In later chapters, we present a
-simulation study to evaluate the performance of the EM algorithm for estimating
-the model parameters under various parameter settings and sample sizes.
+Despite its advantages, estimating MOGE parameters is challenging because the likelihood
+equations do not admit closed-form solutions. The Expectation--Maximization (EM)
+algorithm provides a natural solution by employing a latent-variable representation that
+simplifies the optimization into a manageable sequence of updates \citep{gfg2019}.
+This study presents the full EM framework for the MOGE distribution, investigates its
+statistical characteristics through simulation, and examines its practical behaviour
+across varying sample sizes. Particular emphasis is placed on assessing the strengths and
+limitations of the estimation procedure, especially in small-sample settings.

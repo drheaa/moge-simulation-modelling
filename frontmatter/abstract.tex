@@ -1,15 +1,25 @@
 \begin{abstract}
-This project presents a brief study of the Marshall--Olkin Generalized Exponential
-(MOGE) distribution, a flexible three-parameter lifetime model obtained by applying
-the Marshall--Olkin method to the Generalized Exponential distribution. We first
-review the motivation and theoretical properties of the MOGE model, highlighting its
-ability to capture a wide range of hazard-rate shapes, including increasing, decreasing,
-bathtub-shaped and inverted-bathtub patterns.
+This project presents a focused study of the Marshall--Olkin Generalized Exponential (MOGE)
+distribution, a flexible three-parameter lifetime model that extends the Generalized
+Exponential family through the Marshall--Olkin method.
+The model’s ability to represent a wide variety of hazard-rate shapes---such as increasing,
+decreasing, bathtub, and inverted-bathtub patterns---motivates its use in reliability
+contexts where classical models prove insufficient.
 
-We then focus on parameter estimation using the Expectation--Maximization (EM)
-algorithm. The EM procedure is implemented and its performance is investigated
-through a simulation study under different parameter settings and sample sizes. A real
-data set is also analysed to illustrate the practical usefulness of the MOGE model.
-The results suggest that the MOGE distribution is a promising alternative to classical
-lifetime models, especially when data exhibit non-standard hazard-rate behaviour.
+A complete likelihood-based estimation procedure is developed using the
+Expectation--Maximization (EM) algorithm, with particular attention to the latent-variable
+structure that enables tractable parameter updates.
+Incorporating fixed-point iterations for two of the parameters and a closed-form update
+for the third produces a practical and stable estimation routine.
+A comprehensive simulation study evaluates estimator behaviour across multiple sample
+sizes, demonstrating that parameter recovery improves markedly as data volume increases.
+The anticipated EM pattern of non-decreasing likelihood is established through
+convergence diagnostics, and the model’s theoretical consistency is confirmed using bias
+and mean squared error analyses.
+
+Nevertheless, the results indicate that sensitivity to small sample sizes is inevitable,
+as likelihood surfaces become unstable and parameter estimates vary widely.
+Collectively, these findings suggest that the MOGE distribution is a powerful and
+flexible lifetime model; however, its effective application relies on sufficient data
+availability and thoughtful initialization of the EM algorithm.
 \end{abstract}
