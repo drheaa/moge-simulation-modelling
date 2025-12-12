@@ -1,40 +1,107 @@
-﻿\chapter{Simulation Study}
+\chapter{Data Analysis}
 
 \section{Introduction}
 
-In this chapter, we conduct a simulation study to assess the performance of the EM algorithm for the MOGE distribution under controlled conditions. Unlike real data analysis, simulation allows us to define true parameters and generate synthetic observations directly from the MOGE distribution. This removes external variability and makes it possible to evaluate how well the EM algorithm performs across varying sample sizes.
+In this chapter, we analyze real tensile-strength data with 56 single carbon fiber measurements tested under tension at a gauge length of 1 mm, in GPa. The dataset was originally provided by Prof. R.G. Surles and represents strength values of individual fibers extracted from a 1000-filament tow. Since the tensile strength is inherently a positive, continuous, time-to-failure-like variable, probabilistic modeling by using lifetime distributions becomes a natural choice. 
 
-% ---------------------------------------------------------
-\section{Simulation Setup and Methodology}
+This analysis aims to assess the fitness of MOGE to this material-strength data in comparison with traditional reliability models, such as Weibull and Gamma. The flexibility of MOGE in modeling increasing hazard structures and tail behavior is carried out through its three-parameter configuration, namely: α, λ, and θ. With the use of the EM algorithm, the application of the MOGE distribution to this dataset will be implemented herein to estimate parameters, perform goodness-of-fit assessments, and establish whether MOGE indeed confers a better representation of carbon-fiber failure characteristics compared to traditional models. 
 
-Synthetic i.i.d.\ samples were generated from the MOGE distribution with true parameters:
+This chapter involves exploratory visualization, MOGE parameter estimation, comparative model fitting, and interpretation of results. These results form the empirical basis that will link real-world data behavior to the simulation investigation performed in Chapter 7. 
+
+% ----------------------------------------------------------
+\section{Exploratory Data Analysis}
+% ----------------------------------------------------------
+
+\subsection*{Histogram with Fitted MOGE PDF}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/hist_moge.png}
+    \caption{Histogram of Carbon Fiber Strength with fitted MOGE PDF}
+\end{figure}
+
+The histogram overlaid with the fitted MOGE probability density exhibits a single clear peak around 3.8–4.5 GPa, showing that most fibers fail within this strength range. The shape of the distribution is unimodal with slight right-skewness, suggesting that while moderate-strength samples are common, very strong fibers exist but occur less frequently. 
+
+The smooth curve of the MOGE PDF aligns reasonably well with the data frequency bars, particularly around the peak region, implying that the MOGE family can capture both the central mass and the tail decline effectively. The light tail extension toward higher strength values further reflects material behavior: fibers occasionally withstand higher loads, but such events become progressively rarer. 
+
+From the descriptive view alone, there is no evidence of clustering or multi-modality, and the data appear continuous without extreme anomalies. This makes the dataset suitable for parametric modeling using lifetime distributions. The right-skewed behavior and increasing failure tendency at higher strengths align well with models capable of representing accelerating hazard rates, strengthening the choice of MOGE, Weibull, and Gamma for comparative modelling in later analysis. 
+
+This visual understanding provides the foundation for subsequent fitting, goodness-of-fit testing, and inferential comparison of reliability models. 
+
+% ----------------------------------------------------------
+\subsection*{Empirical CDF vs MOGE CDF}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/cdf_moge.png}
+    \caption{Empirical CDF vs Fitted MOGE CDF}
+\end{figure}
+
+Figure 6.2 compares the empirical cumulative distribution with the theoretical MOGE CDF. The following figure provides the empirical cumulative distribution function of the carbon fiber strength data plotted against the fitted MOGE cumulative distribution. Each blue point represents the observed proportion of samples failing below a given strength level, while the red dashed curve corresponds to the theoretical CDF computed using the fitted MOGE parameters.
+
+The two curves lie close in the entire support; the vertical deviations, in particular in the central region of ≈3.5–5.0 GPa, where most observations lie, remain limited. The lower tail (weaker fibers) shows an early smooth rise both in the empirical and fitted curves, suggesting that MOGE characterizes the low-strength probabilities quite well. There is some separation around the upper tail for >5.2 GPa, where sparsity leads to uncertainty, though the model still follows the overall trend without large misfit.
+
+The visual consistency is also confirmed quantitatively by the Kolmogorov-Smirnov statistic of 0.0474, a low value indicating strong agreement between the empirical distribution and the fitted model. Such a goodness-of-fit supports the fact that MOGE not only captures the shape of the density but also accurately describes cumulative failure behavior crucial requirement in material reliability applications where cumulative probabilities determine safety margins and tolerance thresholds.
+
+The CDF alignment, therefore, gives further assurance that MOGE is an appropriate lifetime distribution for carbon fibre strength data, and supports the subsequent comparative modelling using Weibull and Gamma.
+
+% ----------------------------------------------------------
+\subsection*{TTT Plot (Total Time on Test)}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/ttt_plot.png}
+    \caption{TTT plot of Carbon Fiber Strength Data}
+\end{figure}
+Figure 6.3 presents the TTT curve for carbon fiber strength data. The empirical curve in red is significantly below the 45° reference line. This reflects an IFR pattern, meaning that as the strength level increases, the probability of failure grows progressively a typical characteristic of brittle materials such as carbon fibers under tensile load progressively. Since the concavity of the TTT curve indicates departure from constant hazard, it also explains why the exponential distribution performed the weakest during model comparison. This is further evidence for the good performance of MOGE, which can mimic monotonic hazard structures and hence be appropriate for fitting this kind of strength data.
+
 \[
-(\alpha_0 = 1.5,\; \lambda_0 = 0.8,\; \theta_0 = 1.2),
+\text{TTT curve below diagonal} \Rightarrow \text{Increasing Failure Rate (IFR)}
 \]
-chosen to reflect moderately increasing hazard rates.
 
-Samples were generated for increasing sample sizes:
+% ----------------------------------------------------------
+\section{Model Fitting and Parameter Estimation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/pdf_comparison.png}
+    \caption{PDF comparison: MOGE vs Weibull vs Gamma}
+\end{figure}
+
+To evaluate the suitability of lifetime models for the carbon fiber strength data, Weibull, Gamma, and MOGE distributions were fitted using their respective MLE/EM-based parameter estimates. The fitted probability density functions are shown alongside the empirical histogram. The MOGE model aligns most closely with the peak and shoulder behavior of the data, effectively capturing both moderate left-skewness and tail decay. The Weibull model underestimates the central peak and decays faster on the right tail, while Gamma shows underfitting in the mid-range, indicating reduced flexibility in shape adaptation. This visual comparison suggests that the MOGE distribution provides the most accurate density representation, consistent with its improved flexibility from the additional θ parameter. 
+
+% ----------------------------------------------------------
+\section{Goodness-of-fit Results}
+
+Goodness-of-fit was assessed through log-likelihood and KS metrics. The fitted results obtained are:
+
 \[
-n \in \{30,\, 50,\, 100,\, 200\}.
+\text{MOGE: } \alpha=201.346,\; \lambda=2.0817,\; \theta=33.529,\; LL=-68.00,\; KS=0.0474
+\]
+\[
+\text{Weibull: shape}=5.706,\; scale=4.596,\; LL=-68.93,\; KS=0.0902
+\]
+\[
+\text{Gamma: shape}=26.284,\; scale=0.162,\; LL=-68.38,\; KS=0.0537
 \]
 
-For each sample size, multiple Monte Carlo replications were performed. In each run, synthetic times were drawn from the MOGE model, the EM algorithm was applied to re-estimate parameters, and resulting estimates were recorded.
+Goodness-of-fit was evaluated using log-likelihood values, Kolmogorov–Smirnov statistics, and visual comparison of fitted curves. Among the three candidate models, MOGE, Weibull, and Gamma, the MOGE distribution achieved the highest log-likelihood (–68.00) and the lowest KS statistic (0.0474), indicating the closest agreement between theoretical and empirical distributions. The CDF overlay confirmed that MOGE tracks the empirical staircase curve more smoothly across the entire range of strengths, while Weibull deviated noticeably in the upper tail and Gamma slightly mismatched around the median region. These results demonstrate that MOGE provides the best overall fit by balancing flexibility in shape, capturing both moderate skewness and tail behavior. Weibull performed reasonably but lacked adaptability in the tail, and Gamma aligned moderately in the central region but showed comparatively higher mismatch. Overall, the analysis confirms that MOGE is the most adequate model for the carbon fiber strength dataset, supported consistently by both statistical metrics and visual diagnostics. 
 
-% ---------------------------------------------------------
-\section{Estimator Performance}
+% ----------------------------------------------------------
+\section{Discussion}
 
-The distribution of parameter estimates for each sample size was visualized. When $n=30$, estimates were widely spread, indicating high variance and uncertainty. As sample size increased to $n=50$ and $n=100$, the dispersion narrowed considerably. By $n=200$, the estimator became tightly concentrated.
+The fitted results reveal that the Marshall–Olkin Generalized Exponential (MOGE) distribution offers a highly flexible structure capable of capturing the underlying behavior of the carbon fiber strength data more effectively than classical Weibull and Gamma models. The superior log-likelihood and lowest KS statistic highlight the model’s capability to represent both the central bulk of the distribution and the heavier tail observed in higher strength values. The PDF comparison also shows that MOGE aligns closely with the histogram, whereas Weibull tends to underfit the right tail and Gamma slightly overshoot the middle region. This reinforces the value of the additional θ parameter in MOGE, which enables better control over tail behavior and hazard characteristics. 
 
-The mean squared error and bias were calculated for each estimated parameter. Both metrics displayed a clear decreasing trend across increasing sample sizes, confirming that the EM procedure for MOGE is asymptotically consistent.
+The TTT plot provides further insight, showing an upward-convex curve that indicates an increasing failure rate. This pattern is consistent with brittle fiber failure mechanics where the probability of failure increases as stress approaches critical limits. Such behavior supports the suitability of MOGE, which accommodates increasing hazard rates more effectively compared to exponential-type models with constant hazard assumptions. Additionally, the empirical CDF compared with the fitted CDF demonstrates smooth convergence across quantiles, confirming that sample observations align well with the theoretical form. 
 
-% ---------------------------------------------------------
-\section{Convergence Behaviour}
+Overall, the findings suggest that MOGE is not only statistically superior but also structurally meaningful for modeling carbon fiber strength data. The ability to capture variability and tail risk makes it particularly suitable for reliability and material strength applications where extreme behavior plays a critical role. Future work may extend this analysis to confidence interval estimation, bootstrapping for parameter variability, or comparison across larger datasets to examine robustness under broader conditions. 
 
-The log-likelihood values were recorded across EM iterations. As expected from the EM algorithm theory, the likelihood improved after each update step, reflecting the non-decreasing likelihood guarantee.
+% ----------------------------------------------------------
+\section{Conclusion}
 
-In full multi-iteration runs, the likelihood continued to increase until reaching stability, confirming convergence occurred smoothly without oscillation or divergence.
+The analysis of the carbon fiber tensile strength dataset demonstrates the effectiveness of distributional modelling in understanding material reliability characteristics. Among the fitted models Weibull, Gamma, and MOGE, the Marshall–Olkin Generalized Exponential distribution showed the best overall performance, reflected through the highest log-likelihood and lowest KS statistic. Visual comparisons from the PDF/CDF plots further validated this, with MOGE closely following the empirical behavior of the data and capturing the tail region more accurately. 
 
-% ---------------------------------------------------------
-\section{Summary}
+The TTT plot indicated an increasing failure rate, consistent with the physical nature of brittle carbon fibers under tensile stress, supporting the appropriateness of flexible hazard-based models like MOGE. While Weibull and Gamma provided reasonable fits, they were comparatively less adaptable to the spread and skewness visible in the sample. The successful application of the EM-based estimation also highlights MOGE's viability for practical inference despite its three-parameter complexity. 
 
-The simulation study demonstrates that the MOGE EM estimator is theoretically sound and performs well under controlled conditions. The model is capable of recovering true parameters with increasing accuracy as sample size grows.
+Overall, this chapter concludes that MOGE is the most suitable model for representing the carbon fiber strength distribution within the given dataset. It provides a more accurate risk representation, better tail capture, and improved inferential reliability. These insights set the foundation for Chapter 7, where simulation and resampling techniques are used to examine estimator behavior, uncertainty quantification, and model robustness under varying data conditions. 
+
